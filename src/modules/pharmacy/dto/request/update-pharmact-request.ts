@@ -4,6 +4,7 @@ import {
   IsLatitude,
   IsLongitude,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator';
@@ -48,7 +49,7 @@ export class UpdatePharamcyRequest  {
   summery: string;
 
   @ApiPropertyOptional({required:false})
-  @IsString()
+ @IsNumber()
   @IsOptional()
   @Transform(({ value }) => parseInt(value))
   expierence: number;

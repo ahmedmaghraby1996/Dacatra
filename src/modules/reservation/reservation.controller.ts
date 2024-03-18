@@ -120,7 +120,7 @@ export class ReservationController {
   async findOne(@Param('id') id: string) {
     return new ActionResponse(
       this._i18nResponse.entity(
-        new ReservationResponse(await this.reservationService.findOne(id)),
+        new ReservationResponse(await this.reservationService.getResevation(id)),
       ),
     );
   }

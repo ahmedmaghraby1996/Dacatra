@@ -36,6 +36,7 @@ export class OfferResponse {
             ? toUrl(data.doctor.user.avatar)
             : null,
           summery: data.doctor.summery,
+          rating:data.doctor.number_of_reviews==0?0: data.doctor.rating/data.doctor.number_of_reviews,
           experience: data.doctor.year_of_experience,
           specialization: data.doctor.specialization,
         }

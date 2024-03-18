@@ -555,7 +555,11 @@ export class PharmacyService {
       relations: { package: true },
     });
     if (subscription) {
-      subscription_order = subscription.package.number_of_pharmacy_order   <=  subscription.number_of_used_orders? false : true;
+      subscription_order =
+        subscription.package.number_of_pharmacy_order <=
+        subscription.number_of_used_orders
+          ? false
+          : true;
     }
 
     const orders = await this.orderRepository

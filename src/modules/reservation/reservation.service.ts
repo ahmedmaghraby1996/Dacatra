@@ -243,12 +243,12 @@ export class ReservationService extends BaseUserService<Reservation> {
     reservation.price = offer.value;
     reservation.end_date = new Date(new Date().getTime() + 20 * 60000);
     reservation.status = ReservationStatus.STARTED;
-    if (reservation.reservationType != ReservationType.MEETING) {
+    
       reservation.client_agora_token = await this.generateRTCtoken(
         1,
         reservation.id,
       );
-    }
+        
     const doctor = await this.doctor_repository.findOne({
       where: {
         id: reservation.doctor_id,
