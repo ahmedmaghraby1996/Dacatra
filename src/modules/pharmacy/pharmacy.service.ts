@@ -72,7 +72,7 @@ export class PharmacyService {
   ) {}
 
   async makeOrder(request: makeOrderRequest) {
-    if (await this.getMonthlyOrders(this.request.user.id)) {
+    if (await this.getMonthlyOrders(this.request.user.id)==false  ) {
       throw new BadRequestException('you have reached your monthly limit');
     }
     const ph_order = plainToInstance(PhOrder, {
@@ -554,7 +554,9 @@ export class PharmacyService {
       order: { created_at: 'DESC' },
       relations: { package: true },
     });
+
     if (subscription) {
+      console.log(1)
       subscription_order =
         subscription.package.number_of_pharmacy_order <=
         subscription.number_of_used_orders
@@ -574,10 +576,11 @@ export class PharmacyService {
       .andWhere('ph_order.user_id = :user_id', { user_id: id })
       .getCount();
 
-    if (orders >= max_orders || subscription_order) {
+    if (orders >= max_orders && !subscription_order) {
       return false;
     }
     if (subscription) {
+      console.log("2")
       subscription.number_of_used_orders =
         subscription.number_of_used_orders + 1;
       await this.subscriptionRepository.save(subscription);
