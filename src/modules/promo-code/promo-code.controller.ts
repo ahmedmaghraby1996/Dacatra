@@ -26,7 +26,7 @@ export class PromoCodeController {
     async getPromoCode(@Query() query: PaginatedRequest) {
         applyQueryFilters(query, `user_id=${this.request.user.id}`);
         applyQueryFilters(query, `number_of_uses>0`);
-        applyQueryFilters(query, `expiration_date>${new Date()}`);
+        applyQueryFilters(query, `expire_at>${new Date().toISOString().split('T')[0]}`);
         return new ActionResponse(await this.promoCodeService.findAll(query));
     }
 }
