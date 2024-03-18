@@ -81,6 +81,12 @@ export class ReservationService extends BaseUserService<Reservation> {
     const address = await this.address_repository.findOneBy({
       id: request.address_id,
     });
+    if(reservation.promo_code_id){
+      const promoCode = await this.promoCodeRepository.findOneBy({id:reservation.promo_code_id})
+      promoCode.number_of_uses = promoCode.number_of_uses - 1
+      await this.promoCodeRepository.save(promoCode)
+      
+    }
 
     const nearby_doctors =
       request.reservationType == ReservationType.MEETING
@@ -204,8 +210,7 @@ export class ReservationService extends BaseUserService<Reservation> {
       privilegeExpireTime,
     );
 
-    console.log(`ch-${reservation_id}`);
-    console.log(token);
+    
     return token;
   }
 
@@ -421,6 +426,8 @@ export class ReservationService extends BaseUserService<Reservation> {
       });
       value = value - (value * promo_code.discount) / 100;
       reservation.price = value;
+      promo_code.number_of_uses--;
+      await this.promoCodeRepository.save(promo_code);
     }
     await this._repo.save(reservation);
     await this.transactionService.makeTransaction(
