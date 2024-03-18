@@ -118,11 +118,12 @@ export class ReservationController {
   @Roles(Role.CLIENT)
   @Get('/:id')
   async findOne(@Param('id') id: string) {
+
     return new ActionResponse(
       this._i18nResponse.entity(
-        new ReservationResponse(await this.reservationService.getResevation(id)),
+        new ReservationResponse(  this._i18nResponse.entity(await this.reservationService.getResevation(id))),
       ),
-    );
+    );  
   }
   @Roles(Role.CLIENT)
   @Post('/rate')
