@@ -15,7 +15,7 @@ export class DoctorService extends BaseUserService<Doctor> {
   }
 
   async findOne(id: string) {
-    console.log(id);
+   
 
     return await this.repository.findOne({
       where: { id },

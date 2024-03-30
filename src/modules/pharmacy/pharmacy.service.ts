@@ -344,13 +344,13 @@ export class PharmacyService {
     limit = limit || 20;
     page = page || 1;
     const pharamcy = await this.pharmacyRepository.findOne({
-      where: { user_id: this.request.user.id },
+      where: { user_id:  this.request.user.id },
     });
 
     const orders = await this.orderRepository.find({
       where: this.request.user.roles.includes(Role.PHARMACY)
         ? { nearby_pharmacies: ILike(`%${pharamcy.id}%`) }
-        : { user_id: this.request.user.id },
+        : { user_id:this.request.user.roles.includes(Role.ADMIN)?null: this.request.user.id },
       relations: {
         user: true,
         ph_order_attachments: true,

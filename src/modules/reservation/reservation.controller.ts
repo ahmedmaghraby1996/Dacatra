@@ -75,12 +75,7 @@ export class ReservationController {
         `user_id=${this.reservationService.currentUser.id}`,
       );
     }
-    if (this.reservationService.currentUser.roles.includes(Role.DOCTOR)) {
-      // applyQueryFilters(
-      //   query,
-      //   `nearby_doctors#%${(await this.additonalInfoService.getDoctor()).id}%`,
-      // );
-    }
+ 
 
     const reservations = this._i18nResponse.entity(
       await this.reservationService.findAll(query),
@@ -118,12 +113,15 @@ export class ReservationController {
   @Roles(Role.CLIENT)
   @Get('/:id')
   async findOne(@Param('id') id: string) {
-
     return new ActionResponse(
       this._i18nResponse.entity(
-        new ReservationResponse(  this._i18nResponse.entity(await this.reservationService.getResevation(id))),
+        new ReservationResponse(
+          this._i18nResponse.entity(
+            await this.reservationService.getResevation(id),
+          ),
+        ),
       ),
-    );  
+    );
   }
   @Roles(Role.CLIENT)
   @Post('/rate')
