@@ -110,7 +110,7 @@ export class ReservationController {
     }
   }
 
-  @Roles(Role.CLIENT)
+ 
   @Get('/:id')
   async findOne(@Param('id') id: string) {
     return new ActionResponse(
