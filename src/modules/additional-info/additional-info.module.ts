@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AdditionalInfoController } from './additional-info.controller';
 import { AdditionalInfoService } from './additional-info.service';
 import { PharmacyService } from '../pharmacy/pharmacy.service';
-import { NurseService } from '../nurse/nurse.service';
+import { NurseOrderService } from '../nurse/nurse.service';
 import { PhOrderGateway } from 'src/integration/gateways/ph-order.gateway';
 import { NotificationService } from '../notification/services/notification.service';
 import { FileService } from '../file/file.service';
@@ -14,7 +14,7 @@ import { TransactionService } from '../transaction/transaction.service';
   controllers: [AdditionalInfoController],
   providers: [
     AdditionalInfoService,
-    NurseService,
+    NurseOrderService,
     PharmacyService,
     NotificationService,
     PhOrderGateway,

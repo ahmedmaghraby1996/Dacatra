@@ -32,7 +32,7 @@ import { ReservationStatus } from 'src/infrastructure/data/enums/reservation-sta
 import { TransactionService } from '../transaction/transaction.service';
 import { MakeTransactionRequest } from '../transaction/dto/requests/make-transaction-request';
 @Injectable()
-export class NurseService extends BaseUserService<NurseOrder> {
+export class NurseOrderService extends BaseUserService<NurseOrder> {
   constructor(
     @InjectRepository(NurseOrder)
     private readonly nurseOrderRepo: Repository<NurseOrder>,
@@ -281,4 +281,17 @@ export class NurseService extends BaseUserService<NurseOrder> {
     await this.nurseOrderRepo.save(order);
     return await this.getSingleOrder(request.order_id);
   }
+}
+
+
+@Injectable()
+export class NurseService extends BaseUserService<Nurse>{
+  constructor(
+    @InjectRepository(Nurse) private nurseRepo: Repository<Nurse>,
+    @Inject(REQUEST) request: Request,
+  
+   ){
+      super(nurseRepo,request);
+    }
+
 }

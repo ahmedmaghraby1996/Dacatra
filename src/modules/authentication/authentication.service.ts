@@ -18,7 +18,7 @@ import { Doctor } from 'src/infrastructure/entities/doctor/doctor.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PharmacyService } from '../pharmacy/pharmacy.service';
-import { NurseService } from '../nurse/nurse.service';
+import { NurseOrderService } from '../nurse/nurse.service';
 import { Wallet } from 'src/infrastructure/entities/wallet/wallet.entity';
 
 @Injectable()
@@ -34,7 +34,7 @@ export class AuthenticationService {
     private readonly verifyOtpTransaction: VerifyOtpTransaction,
     @Inject(JwtService) private readonly jwtService: JwtService,
     @Inject(PharmacyService) private readonly pharmacyService: PharmacyService,
-    @Inject(NurseService) private readonly nurseService: NurseService,
+    @Inject(NurseOrderService) private readonly nurseService: NurseOrderService,
     @InjectRepository(Wallet) private readonly walletRepo: Repository<Wallet>,
     @Inject(AdditionalInfoService)
     private readonly additonalService: AdditionalInfoService,

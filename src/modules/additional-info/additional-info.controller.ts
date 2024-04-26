@@ -37,7 +37,7 @@ import { UpdateProfileRequest } from '../authentication/dto/requests/update-prof
 import { plainToInstance } from 'class-transformer';
 import { RegisterResponse } from '../authentication/dto/responses/register.response';
 import { UpdateNurseRequest } from '../nurse/dto/request/update-nurse-request';
-import { NurseService } from '../nurse/nurse.service';
+import { NurseOrderService } from '../nurse/nurse.service';
 import { PharmacyService } from '../pharmacy/pharmacy.service';
 import { UpdatePharamcyRequest } from '../pharmacy/dto/request/update-pharmact-request';
 import { PharmacyResponse } from '../pharmacy/dto/respone/pharmacy.reposne';
@@ -54,7 +54,7 @@ export class AdditionalInfoController {
   constructor(
     private readonly additionalInfoService: AdditionalInfoService,
     @Inject(I18nResponse) private readonly _i18nResponse: I18nResponse,
-    private readonly nurseService: NurseService,
+    private readonly nurseService: NurseOrderService,
     private readonly PharmacyService: PharmacyService,
   ) {}
 
@@ -224,7 +224,7 @@ export class AdditionalInfoController {
     return new ActionResponse(
       await this.PharmacyService.addPharmacyInfo(
         request,
-        this.PharmacyService.request.user.id,
+        this.PharmacyService.currentUser.id,
       ),
     );
   }
@@ -253,7 +253,7 @@ export class AdditionalInfoController {
   @Get('pharmacy-info')
   async getPharmacyInfo() {
     const pharamcy = await this.PharmacyService.getPharmacyInfo(
-      this.PharmacyService.request.user.id,
+      this.PharmacyService.currentUser.id,
     );
 
     const categories = await this.PharmacyService.getCategories(

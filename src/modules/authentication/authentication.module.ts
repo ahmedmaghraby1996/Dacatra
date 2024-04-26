@@ -9,7 +9,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import JWTSetup from 'src/core/setups/jwt.setup';
 import { AdditionalInfoService } from '../additional-info/additional-info.service';
 import { PharmacyService } from '../pharmacy/pharmacy.service';
-import { NurseService } from '../nurse/nurse.service';
+import { NurseOrderService } from '../nurse/nurse.service';
 import { FileService } from '../file/file.service';
 import { NotificationModule } from '../notification/notification.module';
 import { NotificationService } from '../notification/services/notification.service';
@@ -31,7 +31,7 @@ import { TransactionService } from '../transaction/transaction.service';
     JwtStrategy,
     AdditionalInfoService,
     PharmacyService,
-    NurseService,
+    NurseOrderService,
     FileService,
     NotificationService,
     PhOrderGateway,

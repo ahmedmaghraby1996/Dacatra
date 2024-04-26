@@ -36,12 +36,13 @@ import { PhOrderGateway } from 'src/integration/gateways/ph-order.gateway';
 import { I18nResponse } from 'src/core/helpers/i18n.helper';
 import { UpdatePharamcyRequest } from './dto/request/update-pharmact-request';
 import { Subscription } from 'src/infrastructure/entities/subscription/subscription.entity';
+import { BaseUserService } from 'src/core/base/service/user-service.base';
 
 @Injectable()
-export class PharmacyService {
+export class PharmacyService extends BaseUserService<Pharmacy> {
   constructor(
     @InjectRepository(DrugCategory)
-    private drugCategoryRepository: Repository<DrugCategory>,
+    public drugCategoryRepository: Repository<DrugCategory>,
     @InjectRepository(PhOrder)
     private orderRepository: Repository<PhOrder>,
     @InjectRepository(Pharmacy)
@@ -68,16 +69,20 @@ export class PharmacyService {
 
     @InjectRepository(PhReply)
     private replyRepository: Repository<PhReply>,
-    @Inject(REQUEST) readonly request: Request,
-  ) {}
+    @Inject(REQUEST) request: Request,
+  ) {
+    super(pharmacyRepository, request);
+  }
 
+
+  
   async makeOrder(request: makeOrderRequest) {
-    if (await this.getMonthlyOrders(this.request.user.id)==false  ) {
+    if ((await this.getMonthlyOrders(this.currentUser.id)) == false) {
       throw new BadRequestException('you have reached your monthly limit');
     }
     const ph_order = plainToInstance(PhOrder, {
       ...request,
-      user_id: this.request.user.id,
+      user_id: this.currentUser.id,
     });
     const count = await this.orderRepository
       .createQueryBuilder('order')
@@ -323,7 +328,7 @@ export class PharmacyService {
   }
   async getReplies(id: string) {
     const pharamcy = await this.pharmacyRepository.findOne({
-      where: { user_id: this.request.user.id },
+      where: { user_id: this.currentUser.id },
     });
     const replies = await this.PhReplyRepository.find({
       where: {
@@ -344,13 +349,17 @@ export class PharmacyService {
     limit = limit || 20;
     page = page || 1;
     const pharamcy = await this.pharmacyRepository.findOne({
-      where: { user_id:  this.request.user.id },
+      where: { user_id: this.currentUser.id },
     });
 
     const orders = await this.orderRepository.find({
-      where: this.request.user.roles.includes(Role.PHARMACY)
+      where: this.currentUser.roles.includes(Role.PHARMACY)
         ? { nearby_pharmacies: ILike(`%${pharamcy.id}%`) }
-        : { user_id:this.request.user.roles.includes(Role.ADMIN)?null: this.request.user.id },
+        : {
+            user_id: this.currentUser.roles.includes(Role.ADMIN)
+              ? null
+              : this.currentUser.id,
+          },
       relations: {
         user: true,
         ph_order_attachments: true,
@@ -388,9 +397,9 @@ export class PharmacyService {
       skip: (page - 1) * limit,
     });
     const orders_count = await this.orderRepository.countBy(
-      this.request.user.roles.includes(Role.PHARMACY)
+      this.currentUser.roles.includes(Role.PHARMACY)
         ? { nearby_pharmacies: ILike(`%${pharamcy.id}%`) }
-        : { user_id: this.request.user.id },
+        : { user_id: this.currentUser.id },
     );
 
     const result = await Promise.all(
@@ -433,7 +442,7 @@ export class PharmacyService {
 
   async orderReply(request: PhOrderReplyRequest) {
     const pharamcy = await this.pharmacyRepository.findOne({
-      where: { user_id: this.request.user.id },
+      where: { user_id: this.currentUser.id },
     });
 
     const reply = plainToInstance(PhReply, {
@@ -556,7 +565,7 @@ export class PharmacyService {
     });
 
     if (subscription) {
-      console.log(1)
+      console.log(1);
       subscription_order =
         subscription.package.number_of_pharmacy_order <=
         subscription.number_of_used_orders
@@ -580,7 +589,7 @@ export class PharmacyService {
       return false;
     }
     if (subscription) {
-      console.log("2")
+      console.log('2');
       subscription.number_of_used_orders =
         subscription.number_of_used_orders + 1;
       await this.subscriptionRepository.save(subscription);

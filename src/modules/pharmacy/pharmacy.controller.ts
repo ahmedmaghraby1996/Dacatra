@@ -27,6 +27,8 @@ import { PhReply } from 'src/infrastructure/entities/pharmacy/ph-reply.entity';
 import { PhOrderResponse } from './dto/respone/ph-order-response';
 import { PhReplyResponse } from './dto/respone/ph-reply-response';
 import { UpdatePharamcyRequest } from './dto/request/update-pharmact-request';
+import { PharmacyResponse } from './dto/respone/pharmacy.reposne';
+import { applyQueryIncludes } from 'src/core/helpers/service-related.helper';
 
 @ApiHeader({
   name: 'Accept-Language',
@@ -40,6 +42,32 @@ export class PharmacyController {
     private readonly pharmacyService: PharmacyService,
     @Inject(I18nResponse) private readonly _i18nResponse: I18nResponse,
   ) {}
+
+  @Get()
+  async getPharamcy(@Query() query: PaginatedRequest) {
+    applyQueryIncludes(query, 'attachments');
+    const pharmacies = await this.pharmacyService.findAll(query);
+    await Promise.all(
+      pharmacies.map(async (pharmacy) => {
+        pharmacy.categories =
+          (await this.pharmacyService.drugCategoryRepository.findByIds(
+            pharmacy.categories,
+          )) as unknown as string[];
+      }),
+    );
+    const result = plainToInstance(
+      PharmacyResponse,
+      this._i18nResponse.entity(pharmacies),
+    );
+    if (query.page && query.limit) {
+      const total = await this.pharmacyService.count(query);
+      return new PaginatedResponse(result, {
+        meta: { total: total, ...query },
+      });
+    } else {
+      return new ActionResponse(result);
+    }
+  }
 
   @Get('/drugs')
   async getDrugs(@Query() query: FindDrugQuery) {
@@ -78,7 +106,7 @@ export class PharmacyController {
     return new ActionResponse(
       await this.pharmacyService.addPharmacyInfo(
         request,
-        this.pharmacyService.request.user.id,
+        this.pharmacyService.currentUser.id,
       ),
     );
   }

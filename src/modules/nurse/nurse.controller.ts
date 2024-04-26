@@ -9,7 +9,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { NurseService } from './nurse.service';
+import { NurseOrderService, NurseService } from './nurse.service';
 import { NurseOrderRequest } from './dto/request/nurse-order-request';
 
 import { ActionResponse } from 'src/core/base/responses/action.response';
@@ -32,6 +32,7 @@ import { UpdateNurseRequest } from './dto/request/update-nurse-request';
 import { request } from 'http';
 import { RateDoctorRequest } from '../reservation/dto/requests/rate-doctor-request';
 import { CancelReservationRequest } from '../reservation/dto/requests/cancel-reservation-request';
+import { NurseResponse } from './dto/respone/nurse.response';
 
 @ApiTags('Nusre')
 @ApiHeader({
@@ -44,19 +45,47 @@ import { CancelReservationRequest } from '../reservation/dto/requests/cancel-res
 @Controller('nurse')
 export class NurseController {
   constructor(
-    @Inject(NurseService) private readonly nurseService: NurseService,
+    @Inject(NurseOrderService) private readonly nurseOrderService: NurseOrderService,
+    @Inject(NurseService)private readonly nurseService:NurseService
   ) {}
+
+  @Get()
+  async getNurse(@Query() query: PaginatedRequest) {
+    applyQueryIncludes(query, 'user');
+
+    const nurses = await this.nurseService.findAll(query);
+
+    const result = nurses.map((nurse) => {
+      return  new NurseResponse({
+        id: nurse.id,
+        rating:
+          nurse.number_of_reviews == 0
+            ? 0
+            : nurse.rating / nurse.number_of_reviews,
+        name: nurse.user.first_name + ' ' + nurse.user.last_name,
+        avatar: nurse.user.avatar,
+        phone: nurse.user.phone,
+      });
+    });
+
+    if (query.limit && query.page) {
+      const count = await this.nurseOrderService.count(query);
+      return new PaginatedResponse(result, {
+        meta: { total: count, ...query },
+      });
+    } else return new ActionResponse(result);
+  }
 
   @Post('order')
   async createNurseorder(@Body() request: NurseOrderRequest) {
     return new ActionResponse(
-      await this.nurseService.createNurseOrder(request),
+      await this.nurseOrderService.createNurseOrder(request),
     );
   }
 
   @Post('order/offer')
   async createNurseOffer(@Body() request: NurseOfferRequest) {
-    return new ActionResponse(await this.nurseService.sendOffer(request));
+    return new ActionResponse(await this.nurseOrderService.sendOffer(request));
   }
 
   @Get('order/:id/offers')
@@ -64,7 +93,7 @@ export class NurseController {
     return new ActionResponse(
       plainToInstance(
         NurseOfferResponse,
-        await this.nurseService.getOffers(id),
+        await this.nurseOrderService.getOffers(id),
       ),
     );
   }
@@ -73,7 +102,7 @@ export class NurseController {
     return new ActionResponse(
       plainToInstance(
         NurseOrderResponse,
-        await this.nurseService.clientRating(request),
+        await this.nurseOrderService.clientRating(request),
       ),
     );
   }
@@ -85,24 +114,24 @@ export class NurseController {
     applyQueryIncludes(query, 'address');
     applyQueryIncludes(query, 'nurse');
     applyQueryIncludes(query, 'nurse.user');
-    const nurse = await this.nurseService.getNurse(
-      this.nurseService.currentUser.id,
+    const nurse = await this.nurseOrderService.getNurse(
+      this.nurseOrderService.currentUser.id,
     );
-    const orders = await this.nurseService.findAll(query);
+    const orders = await this.nurseOrderService.findAll(query);
     const order_response = await Promise.all(
       orders.map(async (order) => {
         return plainToInstance(NurseOrderResponse, {
           ...order,
-          sent_offer: await this.nurseService.sentOffer(
+          sent_offer: await this.nurseOrderService.sentOffer(
             order.id,
 
             nurse === null ? null : nurse.id,
           ),
-        },);
+        });
       }),
     );
     if (query.page && query.limit) {
-      const total = await this.nurseService.count(query);
+      const total = await this.nurseOrderService.count(query);
       return new PaginatedResponse(order_response, {
         meta: { total, ...query },
       });
@@ -114,17 +143,17 @@ export class NurseController {
     return new ActionResponse(
       plainToInstance(
         NurseOrderResponse,
-        await this.nurseService.acceptOffer(id),
+        await this.nurseOrderService.acceptOffer(id),
       ),
     );
   }
 
   @Post('cancel/order')
-  async cancelOrder(@Body()request:CancelReservationRequest) {
+  async cancelOrder(@Body() request: CancelReservationRequest) {
     return new ActionResponse(
       plainToInstance(
         NurseOrderResponse,
-        await this.nurseService.nurseCancel(request),
+        await this.nurseOrderService.nurseCancel(request),
       ),
     );
   }
