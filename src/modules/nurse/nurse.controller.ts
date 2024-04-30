@@ -33,6 +33,7 @@ import { request } from 'http';
 import { RateDoctorRequest } from '../reservation/dto/requests/rate-doctor-request';
 import { CancelReservationRequest } from '../reservation/dto/requests/cancel-reservation-request';
 import { NurseResponse } from './dto/respone/nurse.response';
+import { toUrl } from 'src/core/helpers/file.helper';
 
 @ApiTags('Nusre')
 @ApiHeader({
@@ -45,9 +46,15 @@ import { NurseResponse } from './dto/respone/nurse.response';
 @Controller('nurse')
 export class NurseController {
   constructor(
-    @Inject(NurseOrderService) private readonly nurseOrderService: NurseOrderService,
-    @Inject(NurseService)private readonly nurseService:NurseService
+    @Inject(NurseOrderService)
+    private readonly nurseOrderService: NurseOrderService,
+    @Inject(NurseService) private readonly nurseService: NurseService,
   ) {}
+
+  @Post('accept/:user_id')
+  async acceptNurse(@Param('user_id') user_id: string) {
+    return await this.nurseService.acceptNurse(user_id);
+  }
 
   @Get()
   async getNurse(@Query() query: PaginatedRequest) {
@@ -56,7 +63,7 @@ export class NurseController {
     const nurses = await this.nurseService.findAll(query);
 
     const result = nurses.map((nurse) => {
-      return  new NurseResponse({
+      return new NurseResponse({
         id: nurse.id,
         rating:
           nurse.number_of_reviews == 0
@@ -65,6 +72,8 @@ export class NurseController {
         name: nurse.user.first_name + ' ' + nurse.user.last_name,
         avatar: nurse.user.avatar,
         phone: nurse.user.phone,
+        user_id:nurse.user.id,
+        is_verified:nurse.is_verified,
       });
     });
 
@@ -117,6 +126,8 @@ export class NurseController {
     const nurse = await this.nurseOrderService.getNurse(
       this.nurseOrderService.currentUser.id,
     );
+    if(nurse?.is_verified==false)
+      return new ActionResponse([])
     const orders = await this.nurseOrderService.findAll(query);
     const order_response = await Promise.all(
       orders.map(async (order) => {
@@ -156,5 +167,32 @@ export class NurseController {
         await this.nurseOrderService.nurseCancel(request),
       ),
     );
+  }
+  @Get(':id')
+  async getNurseById(@Param('id') id: string) {
+    const nurse = await this.nurseService.nurseRepo.findOne({where: {id: id},relations: ['user','license_images']});
+
+    const result = new NurseResponse({
+      id: nurse.id,
+      rating:
+        nurse.number_of_reviews == 0
+          ? 0
+          : nurse.rating / nurse.number_of_reviews,
+      name: nurse.user.first_name + ' ' + nurse.user.last_name,
+      avatar: nurse.user.avatar,
+      phone: nurse.user.phone,
+      summery: nurse.summary,
+      experience: nurse.experience,
+      user_id:nurse.user.id,
+      is_verified:nurse.is_verified,
+      license_images: nurse.license_images.map((image) => {
+        image.image=toUrl(image.image);
+        return image;
+      })
+
+      
+    });
+
+    return new ActionResponse(result);
   }
 }

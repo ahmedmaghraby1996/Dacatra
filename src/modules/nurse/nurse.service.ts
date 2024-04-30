@@ -31,6 +31,7 @@ import { RateDoctorRequest } from '../reservation/dto/requests/rate-doctor-reque
 import { ReservationStatus } from 'src/infrastructure/data/enums/reservation-status.eum';
 import { TransactionService } from '../transaction/transaction.service';
 import { MakeTransactionRequest } from '../transaction/dto/requests/make-transaction-request';
+import { override } from 'joi';
 @Injectable()
 export class NurseOrderService extends BaseUserService<NurseOrder> {
   constructor(
@@ -116,7 +117,7 @@ export class NurseOrderService extends BaseUserService<NurseOrder> {
     order.number = generateOrderNumber(count);
     order.user_id = super.currentUser.id;
     await this.nurseOrderRepo.save(order);
-    const nurses = await this.nurseRepo.find();
+    const nurses = await this.nurseRepo.find({where:{is_verified:true}});
     await Promise.all(
       nurses.map(async (nurse) => {
         this.nurseOrderGateway.server.emit(
@@ -283,15 +284,23 @@ export class NurseOrderService extends BaseUserService<NurseOrder> {
   }
 }
 
-
 @Injectable()
-export class NurseService extends BaseUserService<Nurse>{
+export class NurseService extends BaseUserService<Nurse> {
   constructor(
-    @InjectRepository(Nurse) private nurseRepo: Repository<Nurse>,
+    @InjectRepository(Nurse) public nurseRepo: Repository<Nurse>,
     @Inject(REQUEST) request: Request,
-  
-   ){
-      super(nurseRepo,request);
-    }
+  ) {
+    super(nurseRepo, request);
+  }
+
+  async acceptNurse(id: string) {
+    const nurse = await this.nurseRepo.findOne({ where: { user_id: id } });
+    if (!nurse) throw new NotFoundException('nurse not found');
+
+    nurse.is_verified = true;
+    return await this.nurseRepo.save(nurse);
+  }
+
 
 }
+

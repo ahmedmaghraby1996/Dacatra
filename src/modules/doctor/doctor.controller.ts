@@ -1,4 +1,4 @@
-import { Controller, Get, Inject, Param, Query } from '@nestjs/common';
+import { Controller, Get, Inject, Param, Post, Query } from '@nestjs/common';
 import { PaginatedRequest } from 'src/core/base/requests/paginated.request';
 import { DoctorService } from './doctor.service';
 import { I18nResponse } from 'src/core/helpers/i18n.helper';
@@ -16,11 +16,18 @@ export class DoctorController {
     @Inject(I18nResponse) private readonly _i18nResponse: I18nResponse,
   ) {}
 
+
+  @Post('accept/:user_id')
+  async acceptDoctor(@Param('user_id')   user_id: string) {
+    return await this.doctorService.acceptDoctor(user_id);
+    
+  }
   @Get()
   async getDoctor(@Query() query: PaginatedRequest) {
     applyQueryIncludes(query, 'clinic');
     applyQueryIncludes(query, 'user');
     applyQueryIncludes(query, 'specialization');
+    
     const doctors = await this.doctorService.findAll(query);
     const data = this._i18nResponse.entity(doctors);
     const doctorsReposonse = data.map(

@@ -13,6 +13,11 @@ export class DoctorService extends BaseUserService<Doctor> {
   ) {
     super(repository, request);
   }
+  async acceptDoctor(id: string) {
+    const doctor = await this.repository.findOne({ where: { user_id: id } });
+    doctor.is_verified = true;
+   return await this.repository.save(doctor);
+  }
 
   async findOne(id: string) {
    

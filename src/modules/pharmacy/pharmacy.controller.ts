@@ -43,6 +43,11 @@ export class PharmacyController {
     @Inject(I18nResponse) private readonly _i18nResponse: I18nResponse,
   ) {}
 
+  @Post('accept/:user_id')
+  async acceptPharmacy(@Param('user_id') user_id: string) {
+    return await this.pharmacyService.acceptPharmacy(user_id);
+  }
+
   @Get()
   async getPharamcy(@Query() query: PaginatedRequest) {
     applyQueryIncludes(query, 'attachments');
@@ -71,7 +76,11 @@ export class PharmacyController {
 
   @Get('/drugs')
   async getDrugs(@Query() query: FindDrugQuery) {
-    return new ActionResponse(await this.pharmacyService.getDrugs(query));
+    const drugs=await this.pharmacyService.getDrugs(query);
+    return new PaginatedResponse(
+      drugs[0],
+      { meta: { total: drugs[1], ...query } },
+    );
   }
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
@@ -136,4 +145,29 @@ export class PharmacyController {
   async orderReply(@Body() request: PhOrderReplyRequest) {
     return new ActionResponse(await this.pharmacyService.orderReply(request));
   }
+  @Get("/:id")
+  async getPharamcyByid(@Param('id') id: string) {
+  
+    const pharmacy = await this.pharmacyService.pharmacyRepository.findOne({where:{id},relations:["attachments"]});
+    await Promise.all(
+      
+        pharmacy.categories =
+          (await this.pharmacyService.drugCategoryRepository.findByIds(
+            pharmacy.categories,
+          )) as unknown as string[]);
+      
+    
+    const result = plainToInstance(
+      PharmacyResponse,
+      this._i18nResponse.entity(pharmacy),
+    );
+  
+      return new ActionResponse(result);
+    
+  }
+
+
+  
+
+  
 }

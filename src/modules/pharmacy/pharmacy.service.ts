@@ -46,7 +46,7 @@ export class PharmacyService extends BaseUserService<Pharmacy> {
     @InjectRepository(PhOrder)
     private orderRepository: Repository<PhOrder>,
     @InjectRepository(Pharmacy)
-    private pharmacyRepository: Repository<Pharmacy>,
+    public pharmacyRepository: Repository<Pharmacy>,
     @Inject(I18nResponse) private readonly _i18nResponse: I18nResponse,
     @InjectRepository(Drug)
     private drugRepository: Repository<Drug>,
@@ -214,10 +214,18 @@ export class PharmacyService extends BaseUserService<Pharmacy> {
 
     return ph_order;
   }
+
+  async acceptPharmacy(id: string) {
+    const pharamcy = await this.pharmacyRepository.findOne({ where: { user_id: id } });
+   pharamcy.is_verified  = true;
+    return await this.pharmacyRepository.save(pharamcy);
+  }
   async getDrugs(query: FindDrugQuery) {
-    const drugs = await this.drugRepository.find({
-      where: { category_id: query.category_id, name: Like(`%${query.name}%`) },
-      take: 50,
+ 
+    const drugs = await this.drugRepository.findAndCount({
+      where: { category_id: query.category_id, name: Like(`%${query.name?query.name:''}%`) },
+      take: query.limit? query.limit:50,
+      skip: query.limit && query.page ? query.limit * (query.page - 1) : 0,
     });
     return drugs;
   }

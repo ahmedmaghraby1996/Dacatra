@@ -7,6 +7,12 @@ export class NurseResponse{
     avatar:string
     rating:number
     phone:string
+    experience:number
+    summery:string
+    license_images:any
+    is_verified:boolean
+    user_id:string
+    
     constructor(data:Partial<NurseResponse>){
 
         this.id=data.id
@@ -14,5 +20,11 @@ export class NurseResponse{
         this.avatar=toUrl(data.avatar)
         this.rating=data.rating
         this.phone=data.phone
+        this.license_images=data.license_images
+        this.experience=data.experience
+        this.summery=data.summery
+        this.user_id=data.user_id
+        this.is_verified=data.is_verified
+
     }
 }
