@@ -78,7 +78,7 @@ export class NurseController {
     });
 
     if (query.limit && query.page) {
-      const count = await this.nurseOrderService.count(query);
+      const count = await this.nurseService.count(query);
       return new PaginatedResponse(result, {
         meta: { total: count, ...query },
       });
