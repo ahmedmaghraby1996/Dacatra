@@ -48,6 +48,10 @@ export class PharmacyController {
     return await this.pharmacyService.acceptPharmacy(user_id);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Roles(Role.ADMIN)
+
   @Get()
   async getPharamcy(@Query() query: PaginatedRequest) {
     applyQueryIncludes(query, 'attachments');
@@ -145,6 +149,9 @@ export class PharmacyController {
   async orderReply(@Body() request: PhOrderReplyRequest) {
     return new ActionResponse(await this.pharmacyService.orderReply(request));
   }
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Roles(Role.ADMIN)
   @Get("/:id")
   async getPharamcyByid(@Param('id') id: string) {
   
