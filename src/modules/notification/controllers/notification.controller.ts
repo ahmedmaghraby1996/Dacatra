@@ -25,6 +25,7 @@ import { PaginatedResponse } from 'src/core/base/responses/paginated.response';
 import { Role } from 'src/infrastructure/data/enums/role.enum';
 import { Roles } from 'src/modules/authentication/guards/roles.decorator';
 import { ActionResponse } from 'src/core/base/responses/action.response';
+import { SendToAllUsersNotificationRequest, SendToUsersNotificationRequest } from '../dto/requests/send-to-users-notification.request';
 
 @ApiBearerAuth()
 @ApiTags('Notifications')
@@ -40,6 +41,10 @@ export class NotificationController {
     @Inject(I18nResponse) private readonly _i18nResponse: I18nResponse,
     private readonly notificationService: NotificationService,
   ) {}
+
+  
+
+
 
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -70,5 +75,21 @@ export class NotificationController {
     });
     return new ActionResponse<NotificationResponse>(response);
   }
+
+  @Post('send-to-users')
+  async sendToUsers(
+    @Body() sendToUsersNotificationRequest: SendToUsersNotificationRequest,
+  ) {
+    await this.notificationService.sendToUsers(sendToUsersNotificationRequest);
+  }
+  @Post('send-to-all')
+  async sendToAll(
+    @Body() sendToUsersNotificationRequest: SendToAllUsersNotificationRequest,
+  ) {
+  return new ActionResponse(  await this.notificationService.sendToALl(sendToUsersNotificationRequest));
+  }
+
+
+
 
 }

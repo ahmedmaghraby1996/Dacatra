@@ -68,7 +68,7 @@ export class Doctor extends OwnedEntity {
   @Column({ type: 'float', precision: 10, scale: 6, nullable: true })
   longitude: number;
 
-  @Column({ nullable: true })
+  @Column({ default:false })
   is_verified: boolean;
 
   @Column({ nullable: true, type: 'decimal', precision: 10, scale: 2 })

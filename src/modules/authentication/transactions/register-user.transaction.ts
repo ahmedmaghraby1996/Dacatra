@@ -77,7 +77,7 @@ export class RegisterUserTransaction extends BaseTransaction<
       if (req.role == Role.DOCTOR) {
         const doctordata = plainToInstance(Doctor, req);
         delete doctordata['avaliablity'];
-        const doctor = new Doctor({ ...doctordata, user_id: user.id });
+        const doctor = new Doctor({ ...doctordata, user_id: user.id,is_verified:false });
 
         await context.save(doctor);
         for (let index = 1; index < 8; index++) {

@@ -46,6 +46,7 @@ import { CancelReservationRequest } from './dto/requests/cancel-reservation-requ
 import { RateDoctorRequest } from './dto/requests/rate-doctor-request';
 import { User } from 'src/infrastructure/entities/user/user.entity';
 import { PromoCode } from 'src/infrastructure/entities/promo-code/promo-code.entity';
+import { Role } from 'src/infrastructure/data/enums/role.enum';
 
 @Injectable()
 export class ReservationService extends BaseUserService<Reservation> {
@@ -488,8 +489,9 @@ export class ReservationService extends BaseUserService<Reservation> {
       where: { id: request.id },
       relations: { doctor: { user: true } },
     });
+    if(this.currentUser.roles.includes(Role.CLIENT)){
     if (reservation.status != ReservationStatus.SCHEDULED)
-      throw new BadRequestException('you can not cancel this reservation');
+      throw new BadRequestException('you can not cancel this reservation');}
     reservation.status = ReservationStatus.CANCELED;
     reservation.cancel_reason = request.reason;
     this.transactionService.makeTransaction(
@@ -505,6 +507,18 @@ export class ReservationService extends BaseUserService<Reservation> {
       new NotificationEntity({
         user_id: reservation.doctor.user_id,
         url: reservation.doctor.user_id,
+        type: NotificationTypes.CANCELED,
+        title_ar: 'تم الغاء حجز',
+        title_en: 'reservation has been canceled',
+        text_ar: 'تم الغاء حجز',
+        text_en: 'reservation has been canceled',
+      }),
+    );
+
+    await this.notificationService.create(
+      new NotificationEntity({
+        user_id: reservation.user_id,
+        url: reservation.user_id,
         type: NotificationTypes.CANCELED,
         title_ar: 'تم الغاء حجز',
         title_en: 'reservation has been canceled',

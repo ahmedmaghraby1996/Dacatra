@@ -9,6 +9,7 @@ import { User } from 'src/infrastructure/entities/user/user.entity';
 import { BaseUserService } from 'src/core/base/service/user-service.base';
 import { NotificationEntity } from 'src/infrastructure/entities/notification/notification.entity';
 import { NotificationTypes } from 'src/infrastructure/data/enums/notification-types.enum';
+import { SendToAllUsersNotificationRequest, SendToUsersNotificationRequest } from '../dto/requests/send-to-users-notification.request';
 
 @Injectable()
 export class NotificationService extends BaseUserService<NotificationEntity> {
@@ -20,6 +21,7 @@ export class NotificationService extends BaseUserService<NotificationEntity> {
     @Inject(REQUEST) request: Request,
     private readonly _userService: UserService,
     private readonly _fcmIntegrationService: FcmIntegrationService,
+    @InjectRepository(User)private readonly userRepository:Repository<User>
   ) {
     super(_repo, request);
   }
@@ -67,6 +69,65 @@ export class NotificationService extends BaseUserService<NotificationEntity> {
     });
     return notifications;
   }
-  //*This For Test
 
+  //*This For Test
+  async sendToUsers(
+    sendToUsersNotificationRequest: SendToUsersNotificationRequest,
+  ) {
+    const { users_id, message_ar, message_en, title_ar, title_en } =
+      sendToUsersNotificationRequest;
+    const BATCH_SIZE = 10; // Adjust batch size based on your server's capacity
+
+    for (let i = 0; i < users_id.length; i += BATCH_SIZE) {
+      const userBatch = users_id.slice(i, i + BATCH_SIZE);
+
+      const notificationPromises = userBatch.map(async (userId) => {
+        const user = await this.userRepository.findOne({
+          where: { id: userId },
+        });
+        if (user) {
+          return this.create(
+            new NotificationEntity({
+              user_id: userId,
+              url: userId,
+              type: NotificationTypes.ADMIN,
+              title_ar: title_ar,
+              title_en: title_en,
+              text_ar: message_ar,
+              text_en: message_en,
+            }),
+          );
+        }
+      });
+
+      // Wait for all notifications in the batch to be processed
+      await Promise.all(notificationPromises).catch((error) => {
+        // Log the error or handle it as needed
+        console.error('Error sending notifications:', error);
+      });
+    }
+  }
+  async sendToALl(
+    sendToUsersNotificationRequest: SendToAllUsersNotificationRequest,
+  ) {
+    const { message_ar, message_en, title_ar, title_en } =
+      sendToUsersNotificationRequest;
+
+    const users = await this.userRepository.find();
+
+    users.map(async (user) => {
+      return this.create(
+        new NotificationEntity({
+          user_id: user.id,
+          url: user.id,
+          type: NotificationTypes.ADMIN,
+          title_ar: title_ar,
+          title_en: title_en,
+          text_ar: message_ar,
+          text_en: message_en,
+        }),
+      );
+    });
+    return "notification sent successfully";
+  }
 }

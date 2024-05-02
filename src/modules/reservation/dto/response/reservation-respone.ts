@@ -57,6 +57,8 @@ export class ReservationResponse {
   created_at?: Date;
   sent_offer: boolean;
   is_urgent: boolean;
+  cancel_reason:string
+  cancel_request:boolean
 
   constructor(data: Partial<ReservationResponse>) {
 
@@ -76,6 +78,8 @@ export class ReservationResponse {
     this.created_at = data.created_at
     this.sent_offer = data.sent_offer;
     this.note = data.note;
+    this.cancel_reason=data.cancel_reason;
+    this.cancel_request=data.cancel_request;
     this.availability = data.availability;
     this.start_date = startDate;
     this.phone = data.phone;
