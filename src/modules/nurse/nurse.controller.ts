@@ -34,6 +34,8 @@ import { RateDoctorRequest } from '../reservation/dto/requests/rate-doctor-reque
 import { CancelReservationRequest } from '../reservation/dto/requests/cancel-reservation-request';
 import { NurseResponse } from './dto/respone/nurse.response';
 import { toUrl } from 'src/core/helpers/file.helper';
+import { Role } from 'src/infrastructure/data/enums/role.enum';
+import { Roles } from '../authentication/guards/roles.decorator';
 
 @ApiTags('Nusre')
 @ApiHeader({
@@ -72,8 +74,8 @@ export class NurseController {
         name: nurse.user.first_name + ' ' + nurse.user.last_name,
         avatar: nurse.user.avatar,
         phone: nurse.user.phone,
-        user_id:nurse.user.id,
-        is_verified:nurse.is_verified,
+        user_id: nurse.user.id,
+        is_verified: nurse.is_verified,
       });
     });
 
@@ -126,8 +128,7 @@ export class NurseController {
     const nurse = await this.nurseOrderService.getNurse(
       this.nurseOrderService.currentUser.id,
     );
-    if(nurse?.is_verified==false)
-      return new ActionResponse([])
+    if (nurse?.is_verified == false) return new ActionResponse([]);
     const orders = await this.nurseOrderService.findAll(query);
     const order_response = await Promise.all(
       orders.map(async (order) => {
@@ -168,9 +169,22 @@ export class NurseController {
       ),
     );
   }
+  @Roles(Role.ADMIN)
+  @Post('admin/cancel/order')
+  async adminCancelOrder(@Body() request: CancelReservationRequest) {
+    return new ActionResponse(
+      plainToInstance(
+        NurseOrderResponse,
+        await this.nurseOrderService.adminCancelOrder(request),
+      ),
+    );
+  }
   @Get(':id')
   async getNurseById(@Param('id') id: string) {
-    const nurse = await this.nurseService.nurseRepo.findOne({where: {id: id},relations: ['user','license_images']});
+    const nurse = await this.nurseService.nurseRepo.findOne({
+      where: { id: id },
+      relations: ['user', 'license_images'],
+    });
 
     const result = new NurseResponse({
       id: nurse.id,
@@ -183,14 +197,12 @@ export class NurseController {
       phone: nurse.user.phone,
       summery: nurse.summary,
       experience: nurse.experience,
-      user_id:nurse.user.id,
-      is_verified:nurse.is_verified,
+      user_id: nurse.user.id,
+      is_verified: nurse.is_verified,
       license_images: nurse.license_images.map((image) => {
-        image.image=toUrl(image.image);
+        image.image = toUrl(image.image);
         return image;
-      })
-
-      
+      }),
     });
 
     return new ActionResponse(result);
