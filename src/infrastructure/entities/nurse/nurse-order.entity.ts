@@ -39,6 +39,9 @@ export class NurseOrder extends OwnedEntity {
   @OneToMany(() => NurseOffer, (offer) => offer.nurse)
   offers: NurseOffer[];
 
+  @Column({ nullable: true, type: 'decimal', precision: 10, scale: 2 })
+  price: number;
+
   @ManyToOne(() => Nurse, (nurse) => nurse.orders)
   nurse: Nurse;
   @Column({ nullable: true })

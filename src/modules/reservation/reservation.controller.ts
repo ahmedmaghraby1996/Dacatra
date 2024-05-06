@@ -142,6 +142,17 @@ export class ReservationController {
       ),
     );
   }
+  @Roles(Role.CLIENT)
+  @Post('admi-cancel')
+  async AdmincancelOrder(@Body() request: CancelReservationRequest) {
+    return new ActionResponse(
+      this._i18nResponse.entity(
+        new ReservationResponse(
+          await this.reservationService.cancelOrder(request),
+        ),
+      ),
+    );
+  }
 
   @Roles(Role.DOCTOR)
   @Post('doctor-cancel')

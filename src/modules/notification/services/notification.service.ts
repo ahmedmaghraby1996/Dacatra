@@ -9,7 +9,10 @@ import { User } from 'src/infrastructure/entities/user/user.entity';
 import { BaseUserService } from 'src/core/base/service/user-service.base';
 import { NotificationEntity } from 'src/infrastructure/entities/notification/notification.entity';
 import { NotificationTypes } from 'src/infrastructure/data/enums/notification-types.enum';
-import { SendToAllUsersNotificationRequest, SendToUsersNotificationRequest } from '../dto/requests/send-to-users-notification.request';
+import {
+  SendToAllUsersNotificationRequest,
+  SendToUsersNotificationRequest,
+} from '../dto/requests/send-to-users-notification.request';
 
 @Injectable()
 export class NotificationService extends BaseUserService<NotificationEntity> {
@@ -21,7 +24,7 @@ export class NotificationService extends BaseUserService<NotificationEntity> {
     @Inject(REQUEST) request: Request,
     private readonly _userService: UserService,
     private readonly _fcmIntegrationService: FcmIntegrationService,
-    @InjectRepository(User)private readonly userRepository:Repository<User>
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {
     super(_repo, request);
   }
@@ -113,7 +116,9 @@ export class NotificationService extends BaseUserService<NotificationEntity> {
     const { message_ar, message_en, title_ar, title_en } =
       sendToUsersNotificationRequest;
 
-    const users = await this.userRepository.find();
+    const users = await this.userRepository.find({
+      where: { roles: sendToUsersNotificationRequest.role },
+    });
 
     users.map(async (user) => {
       return this.create(
@@ -128,6 +133,6 @@ export class NotificationService extends BaseUserService<NotificationEntity> {
         }),
       );
     });
-    return "notification sent successfully";
+    return 'notification sent successfully';
   }
 }

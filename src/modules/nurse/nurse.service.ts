@@ -32,6 +32,7 @@ import { ReservationStatus } from 'src/infrastructure/data/enums/reservation-sta
 import { TransactionService } from '../transaction/transaction.service';
 import { MakeTransactionRequest } from '../transaction/dto/requests/make-transaction-request';
 import { override } from 'joi';
+import { TransactionTypes } from 'src/infrastructure/data/enums/transaction-types';
 @Injectable()
 export class NurseOrderService extends BaseUserService<NurseOrder> {
   constructor(
@@ -117,7 +118,7 @@ export class NurseOrderService extends BaseUserService<NurseOrder> {
     order.number = generateOrderNumber(count);
     order.user_id = super.currentUser.id;
     await this.nurseOrderRepo.save(order);
-    const nurses = await this.nurseRepo.find({where:{is_verified:true}});
+    const nurses = await this.nurseRepo.find({ where: { is_verified: true } });
     await Promise.all(
       nurses.map(async (nurse) => {
         this.nurseOrderGateway.server.emit(
@@ -151,6 +152,47 @@ export class NurseOrderService extends BaseUserService<NurseOrder> {
     });
   }
 
+  async adminCancelOrder(req: CancelReservationRequest) {
+    const reservation = await this.nurseOrderRepo.findOne({
+      where: { id: req.id },
+      relations: { nurse: true, user: true },
+    });
+    reservation.status = ReservationStatus.CANCELED;
+    reservation.cancel_reason = req.reason;
+    await this.nurseOrderRepo.save(reservation);
+    this.transactionService.makeTransaction(
+      new MakeTransactionRequest({
+        amount: reservation.price - reservation.price * 0.1,
+        order_id: reservation.id,
+        type: TransactionTypes.ORDER_CANCEL,
+        user_id: reservation.nurse.user_id,
+        receiver_id: reservation.user_id,
+      }),
+    );
+    await this.notificationService.create(
+      new NotificationEntity({
+        user_id: reservation.nurse.user_id,
+        url: reservation.nurse.user_id,
+        type: NotificationTypes.CANCELED,
+        title_ar: 'تم الغاء حجز',
+        title_en: 'reservation has been canceled',
+        text_ar: 'تم الغاء حجز',
+        text_en: 'reservation has been canceled',
+      }),
+    );
+
+    await this.notificationService.create(
+      new NotificationEntity({
+        user_id: reservation.user_id,
+        url: reservation.user_id,
+        type: NotificationTypes.CANCELED,
+        title_ar: 'تم الغاء حجز',
+        title_en: 'reservation has been canceled',
+        text_ar: 'تم الغاء حجز',
+        text_en: 'reservation has been canceled',
+      }),
+    );
+  }
   async getOffers(id: string) {
     const nurse = await this.nurseRepo.findOne({
       where: { user_id: super.currentUser.id },
@@ -227,7 +269,7 @@ export class NurseOrderService extends BaseUserService<NurseOrder> {
     if (nurse_order.status == ReservationStatus.STARTED)
       throw new BadRequestException('the order is already accepted');
     await this.nurseOfferRepo.save(offer);
-
+    nurse_order.price = offer.value;
     nurse_order.status = ReservationStatus.STARTED;
     nurse_order.nurse_id = offer.nurse_id;
     await this.nurseOrderRepo.save(nurse_order);
@@ -300,7 +342,4 @@ export class NurseService extends BaseUserService<Nurse> {
     nurse.is_verified = true;
     return await this.nurseRepo.save(nurse);
   }
-
-
 }
-

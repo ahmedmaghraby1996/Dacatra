@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsNotEmpty, IsString } from 'class-validator';
+import { IsArray, IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { Role } from 'src/infrastructure/data/enums/role.enum';
 
 export class SendToUsersNotificationRequest {
   @ApiProperty()
@@ -29,8 +30,6 @@ export class SendToUsersNotificationRequest {
 }
 
 export class SendToAllUsersNotificationRequest {
-
-
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
@@ -50,4 +49,11 @@ export class SendToAllUsersNotificationRequest {
   @IsNotEmpty()
   @IsString()
   title_en: string;
+
+  @ApiProperty({
+    enum: [Role.ADMIN, Role.CLIENT, Role.DOCTOR, Role.PHARMACY, Role.NURSE],
+  })
+  @IsNotEmpty()
+  @IsEnum(Role)
+  role: Role;
 }
