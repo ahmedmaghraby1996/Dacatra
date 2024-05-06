@@ -143,7 +143,7 @@ export class ReservationController {
     );
   }
   @Roles(Role.CLIENT)
-  @Post('admi-cancel')
+  @Post('admin-cancel')
   async AdmincancelOrder(@Body() request: CancelReservationRequest) {
     return new ActionResponse(
       this._i18nResponse.entity(
