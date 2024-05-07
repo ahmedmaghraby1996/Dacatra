@@ -149,6 +149,11 @@ export class NurseController {
       });
     } else return new ActionResponse(order_response);
   }
+  @Get('order/:id')
+  async getSingle(@Param('id') id: string) {
+    const order = await this.nurseOrderService.getSingleOrder(id);
+    return new ActionResponse(plainToInstance(NurseOrderResponse, order));
+  }
 
   @Post('accept/offer/:id')
   async acceptOffer(@Param('id') id: string) {
