@@ -37,6 +37,7 @@ import { I18nResponse } from 'src/core/helpers/i18n.helper';
 import { UpdatePharamcyRequest } from './dto/request/update-pharmact-request';
 import { Subscription } from 'src/infrastructure/entities/subscription/subscription.entity';
 import { BaseUserService } from 'src/core/base/service/user-service.base';
+import { CreateDrugRequest } from './dto/request/create-drug-request';
 
 @Injectable()
 export class PharmacyService extends BaseUserService<Pharmacy> {
@@ -74,8 +75,22 @@ export class PharmacyService extends BaseUserService<Pharmacy> {
     super(pharmacyRepository, request);
   }
 
-
+  async addDrug(req: CreateDrugRequest) {
+    return await this.drugRepository.save(new Drug({ ...req }));
+  }
+  async editDrug(id:string,req: CreateDrugRequest) {
+    const drug = await this.drugRepository.findOne({
+      where: {
+        id
+      },
+    })
+    if(!drug){
+      throw new BadRequestException('drug not found')
+    }
+  return  await this.drugRepository.update(id,req)
   
+  }
+
   async makeOrder(request: makeOrderRequest) {
     if ((await this.getMonthlyOrders(this.currentUser.id)) == false) {
       throw new BadRequestException('you have reached your monthly limit');
@@ -216,15 +231,19 @@ export class PharmacyService extends BaseUserService<Pharmacy> {
   }
 
   async acceptPharmacy(id: string) {
-    const pharamcy = await this.pharmacyRepository.findOne({ where: { user_id: id } });
-   pharamcy.is_verified  = true;
+    const pharamcy = await this.pharmacyRepository.findOne({
+      where: { user_id: id },
+    });
+    pharamcy.is_verified = true;
     return await this.pharmacyRepository.save(pharamcy);
   }
   async getDrugs(query: FindDrugQuery) {
- 
     const drugs = await this.drugRepository.findAndCount({
-      where: { category_id: query.category_id, name: Like(`%${query.name?query.name:''}%`) },
-      take: query.limit? query.limit:50,
+      where: {
+        category_id: query.category_id,
+        name: Like(`%${query.name ? query.name : ''}%`),
+      },
+      take: query.limit ? query.limit : 50,
       skip: query.limit && query.page ? query.limit * (query.page - 1) : 0,
     });
     return drugs;

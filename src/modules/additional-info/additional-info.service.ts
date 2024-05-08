@@ -26,6 +26,10 @@ import { Clinic } from 'src/infrastructure/entities/doctor/clinc.entity';
 import { UpdateDoctorInfoRequest } from './dto/requests/update-doctor-info.request';
 import { UpdateProfileRequest } from '../authentication/dto/requests/update-profile-request';
 import { ReservationStatus } from 'src/infrastructure/data/enums/reservation-status.eum';
+import { Pharmacy } from 'src/infrastructure/entities/pharmacy/pharmacy.entity';
+import { Nurse } from 'src/infrastructure/entities/nurse/nurse.entity';
+import { NurseOrder } from 'src/infrastructure/entities/nurse/nurse-order.entity';
+import { PhOrder } from 'src/infrastructure/entities/pharmacy/ph-order.entity';
 @Injectable()
 export class AdditionalInfoService {
   constructor(
@@ -38,6 +42,25 @@ export class AdditionalInfoService {
     @Inject(StorageManager) private readonly storageManager: StorageManager,
   ) {}
 
+  async getStatictics() {
+    const doctors_count = await this.context.count(Doctor);
+    const clients_count = await this.context.count(Client);
+
+    const nurses_count = await this.context.count(Nurse, {});
+    const pharmacy_count = await this.context.count(Pharmacy, {});
+    const reservations_count = await this.context.count(Reservation, {});
+    const nurse_order_count = await this.context.count(NurseOrder, {});
+    const pharamcy_order_count = await this.context.count(PhOrder, {});
+    return {
+      doctors_count,
+      clients_count,
+      nurses_count,
+      pharmacy_count,
+      reservations_count,
+      nurse_order_count,
+      pharamcy_order_count,
+    };
+  }
   async getSpecilizations() {
     return await this.specializationRepo.find();
   }
@@ -50,7 +73,6 @@ export class AdditionalInfoService {
     );
 
     if (request.avatarFile) {
-   
       const resizedImage = await this.imageManager.resize(request.avatarFile, {
         size: { width: 300, height: 300 },
         options: {
@@ -98,8 +120,7 @@ export class AdditionalInfoService {
         await this.context.update(Clinic, doctor.clinic_id, clinc);
       } else {
         const new_clinc = await this.context.save(Clinic, clinc);
-        doctor.clinic= new_clinc;
-      
+        doctor.clinic = new_clinc;
       }
     }
     if (request.latitude && request.longitude) {
@@ -150,7 +171,6 @@ export class AdditionalInfoService {
           ? plainToInstance(DoctorAvaliablity, JSON.parse(request.avaliablity))
           : request.avaliablity;
 
-
       Promise.all(
         (doctor_availiablity as unknown as DoctorAvaliablity[]).map(
           async (e) =>
@@ -165,9 +185,8 @@ export class AdditionalInfoService {
       // await this.context.save(DoctorAvaliablity, availability);
     }
 
-  
     delete doctor.avaliablity;
-  
+
     await this.doctorRepo.save(doctor);
     return this.getFullDoctor(doctor_id);
   }
@@ -176,7 +195,7 @@ export class AdditionalInfoService {
     const license = await this.context.findOne(DoctorLicense, {
       where: { id },
     });
-     fs.unlinkSync(license.image);
+    fs.unlinkSync(license.image);
     await this.context.remove(DoctorLicense, license);
     return license;
   }

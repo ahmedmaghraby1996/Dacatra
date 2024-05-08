@@ -5,6 +5,7 @@ import {
   Inject,
   Param,
   Post,
+  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -29,6 +30,7 @@ import { PhReplyResponse } from './dto/respone/ph-reply-response';
 import { UpdatePharamcyRequest } from './dto/request/update-pharmact-request';
 import { PharmacyResponse } from './dto/respone/pharmacy.reposne';
 import { applyQueryIncludes } from 'src/core/helpers/service-related.helper';
+import { CreateDrugRequest } from './dto/request/create-drug-request';
 
 @ApiHeader({
   name: 'Accept-Language',
@@ -51,7 +53,6 @@ export class PharmacyController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @Roles(Role.ADMIN)
-
   @Get()
   async getPharamcy(@Query() query: PaginatedRequest) {
     applyQueryIncludes(query, 'attachments');
@@ -77,14 +78,26 @@ export class PharmacyController {
       return new ActionResponse(result);
     }
   }
-
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Roles(Role.ADMIN)
+  @Post('/drugs')
+  async addDrug(@Body() request: CreateDrugRequest) {
+    return new ActionResponse(await this.pharmacyService.addDrug(request));
+  }
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Roles(Role.ADMIN)
+  @Put('/drugs/:id')
+  async editDrug(@Param('id') id:string, @Body() request: CreateDrugRequest) {
+    return new ActionResponse(await this.pharmacyService.editDrug(id,(request)));
+  }
   @Get('/drugs')
   async getDrugs(@Query() query: FindDrugQuery) {
-    const drugs=await this.pharmacyService.getDrugs(query);
-    return new PaginatedResponse(
-      drugs[0],
-      { meta: { total: drugs[1], ...query } },
-    );
+    const drugs = await this.pharmacyService.getDrugs(query);
+    return new PaginatedResponse(drugs[0], {
+      meta: { total: drugs[1], ...query },
+    });
   }
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
@@ -152,29 +165,24 @@ export class PharmacyController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @Roles(Role.ADMIN)
-  @Get("/:id")
+  @Get('/:id')
   async getPharamcyByid(@Param('id') id: string) {
-  
-    const pharmacy = await this.pharmacyService.pharmacyRepository.findOne({where:{id},relations:["attachments"]});
+    const pharmacy = await this.pharmacyService.pharmacyRepository.findOne({
+      where: { id },
+      relations: ['attachments'],
+    });
     await Promise.all(
-      
-        pharmacy.categories =
-          (await this.pharmacyService.drugCategoryRepository.findByIds(
-            pharmacy.categories,
-          )) as unknown as string[]);
-      
-    
+      (pharmacy.categories =
+        (await this.pharmacyService.drugCategoryRepository.findByIds(
+          pharmacy.categories,
+        )) as unknown as string[]),
+    );
+
     const result = plainToInstance(
       PharmacyResponse,
       this._i18nResponse.entity(pharmacy),
     );
-  
-      return new ActionResponse(result);
-    
+
+    return new ActionResponse(result);
   }
-
-
-  
-
-  
 }
