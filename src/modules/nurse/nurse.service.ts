@@ -160,6 +160,7 @@ export class NurseOrderService extends BaseUserService<NurseOrder> {
     reservation.status = ReservationStatus.CANCELED;
     reservation.cancel_reason = req.reason;
     await this.nurseOrderRepo.save(reservation);
+    if(reservation.nurse){
     this.transactionService.makeTransaction(
       new MakeTransactionRequest({
         amount: reservation.price - reservation.price * 0.1,
@@ -180,7 +181,7 @@ export class NurseOrderService extends BaseUserService<NurseOrder> {
         text_en: 'reservation has been canceled',
       }),
     );
-
+  }
     await this.notificationService.create(
       new NotificationEntity({
         user_id: reservation.user_id,
