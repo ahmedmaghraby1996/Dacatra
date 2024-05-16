@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Inject,
   Param,
@@ -99,6 +100,14 @@ export class PharmacyController {
       meta: { total: drugs[1], ...query },
     });
   }
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Roles(Role.ADMIN)
+  @Delete('/drugs/:id')
+  async deletDrug(@Param('id') id:string) {
+    return new ActionResponse(await this.pharmacyService.deleteDrug(id));
+  }
+
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @Roles(Role.CLIENT)

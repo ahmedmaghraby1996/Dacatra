@@ -10,6 +10,7 @@ import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import { Transaction } from 'src/infrastructure/entities/wallet/transaction.entity';
 import { MoreThan } from 'typeorm';
+import { UpdatePackageRequest } from './dto/requests/update-package-request';
 
 @Injectable()
 export class PackageService {
@@ -29,6 +30,15 @@ export class PackageService {
   async makePackage(request: CreatePackageRequest) {
     const get_package = plainToInstance(Package, request);
     return await this.packageRepository.save(get_package);
+  }
+  async editPackage(request: UpdatePackageRequest) {
+  
+    return await this.packageRepository.update(request.id,request);
+  }
+
+  async deletePackage(request: string) {
+  
+    return await this.packageRepository.softDelete(request);
   }
 
   async makeSubscription(id: string) {

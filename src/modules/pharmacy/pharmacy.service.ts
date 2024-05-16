@@ -91,6 +91,19 @@ export class PharmacyService extends BaseUserService<Pharmacy> {
   
   }
 
+  async deleteDrug(id:string) {
+    const drug = await this.drugRepository.findOne({
+      where: {
+        id
+      },
+    })
+    if(!drug){
+      throw new BadRequestException('drug not found')
+    }
+  return  await this.drugRepository.softDelete(id)
+  
+  }
+
   async makeOrder(request: makeOrderRequest) {
     if ((await this.getMonthlyOrders(this.currentUser.id)) == false) {
       throw new BadRequestException('you have reached your monthly limit');

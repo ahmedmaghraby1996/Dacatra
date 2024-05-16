@@ -42,6 +42,8 @@ import { PharmacyService } from '../pharmacy/pharmacy.service';
 import { UpdatePharamcyRequest } from '../pharmacy/dto/request/update-pharmact-request';
 import { PharmacyResponse } from '../pharmacy/dto/respone/pharmacy.reposne';
 import { toUrl } from 'src/core/helpers/file.helper';
+import { addSpecilizationRequest } from './dto/requests/add-specilization.request';
+import { EditSpecilizationRequest } from './dto/requests/edit-specilization.request';
 
 @ApiTags('Additonal-info')
 @ApiHeader({
@@ -69,6 +71,30 @@ export class AdditionalInfoController {
     const specializations =
       await this.additionalInfoService.getSpecilizations();
     return new ActionResponse(this._i18nResponse.entity(specializations));
+  }
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Roles(Role.ADMIN)
+  @Post('specializations')
+  async addSpecilizations(@Body() request: addSpecilizationRequest) {
+   
+    return new ActionResponse(await this.additionalInfoService.addSpecilizations(request));
+  }
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Roles(Role.ADMIN)
+  @Put('specializations')
+  async editSpecilizations(@Body() request: EditSpecilizationRequest) {
+   
+    return new ActionResponse(await this.additionalInfoService.editSpecilizations(request));
+  }
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Roles(Role.ADMIN)
+  @Delete('specializations/:id')
+  async deleteSpecilizations(@Param('id') id: string) {
+   
+    return new ActionResponse(await this.additionalInfoService.deleteSpecilizations(id));
   }
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()

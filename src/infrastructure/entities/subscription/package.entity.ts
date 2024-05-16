@@ -1,8 +1,9 @@
 import { BaseEntity } from 'src/infrastructure/base/base.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
 import { Subscription } from './subscription.entity';
+import { AuditableEntity } from 'src/infrastructure/base/auditable.entity';
 @Entity()
-export class Package extends BaseEntity {
+export class Package extends AuditableEntity {
   @Column()
   name_ar: string;
 

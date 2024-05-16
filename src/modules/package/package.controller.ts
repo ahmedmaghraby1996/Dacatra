@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../authentication/guards/jwt-auth.guard';
 import { ApiTags, ApiHeader, ApiBearerAuth } from '@nestjs/swagger';
 import { RolesGuard } from '../authentication/guards/roles.guard';
@@ -6,6 +6,7 @@ import { PackageService } from './package.service';
 import { I18nResponse } from 'src/core/helpers/i18n.helper';
 import { ActionResponse } from 'src/core/base/responses/action.response';
 import { CreatePackageRequest } from './dto/requests/create-package-request';
+import { UpdatePackageRequest } from './dto/requests/update-package-request';
 @ApiTags('Package')
 @ApiHeader({
   name: 'Accept-Language',
@@ -36,6 +37,15 @@ export class PackageController {
     );
   }
 
+  @Put()
+  async editPackage(@Body() request: UpdatePackageRequest) {
+    return new ActionResponse(
+      await this.packageService.editPackage(request),
+    );
+  }
+
+
+
   @Post("/subscription/:id")
   async makeSubscription(@Param('id') id: string) {
     return new ActionResponse(
@@ -51,6 +61,12 @@ export class PackageController {
         await this.packageService.getCurrentSubscription(),   
       )
      
+    );
+  }
+  @Delete("/:id")
+  async deletePackage(@Param('id') id: string) {
+    return new ActionResponse(
+      await this.packageService.deletePackage(id),
     );
   }
 }

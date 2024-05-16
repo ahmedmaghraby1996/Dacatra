@@ -30,6 +30,8 @@ import { Pharmacy } from 'src/infrastructure/entities/pharmacy/pharmacy.entity';
 import { Nurse } from 'src/infrastructure/entities/nurse/nurse.entity';
 import { NurseOrder } from 'src/infrastructure/entities/nurse/nurse-order.entity';
 import { PhOrder } from 'src/infrastructure/entities/pharmacy/ph-order.entity';
+import { addSpecilizationRequest } from './dto/requests/add-specilization.request';
+import { EditSpecilizationRequest } from './dto/requests/edit-specilization.request';
 @Injectable()
 export class AdditionalInfoService {
   constructor(
@@ -63,6 +65,15 @@ export class AdditionalInfoService {
   }
   async getSpecilizations() {
     return await this.specializationRepo.find();
+  }
+  async addSpecilizations(req:addSpecilizationRequest) {
+    return await this.specializationRepo.save(new Specialization({ ...req }));
+  }
+  async editSpecilizations(req:EditSpecilizationRequest) {
+    return await this.specializationRepo.update(req.id,req);
+  }
+  async deleteSpecilizations(id:string) {
+    return await this.specializationRepo.softDelete(id);
   }
 
   async updateProfile(request: UpdateProfileRequest) {
