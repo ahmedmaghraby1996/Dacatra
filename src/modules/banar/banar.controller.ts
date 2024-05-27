@@ -25,6 +25,7 @@ import { UpdateBannerRequest } from './dto/request/update-banner.request';
     description: 'Language header: en, ar',
 })
 @ApiTags('Banar')
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('banar')
 export class BanarController {
     constructor(
@@ -53,6 +54,13 @@ export class BanarController {
         const banners = await this.banarService.getBanars();
         const result = plainToInstance(BannerResponse, banners, { excludeExtraneousValues: true })
         return new ActionResponse<BannerResponse[]>(result);
+    }
+
+    @Get(":id")
+    // @Roles(Role.CLIENT)
+    async getBanar(@Param('id') id: string): Promise<ActionResponse<BannerResponse>> {
+        const banar = await this.banarService.findOne(id);
+        return new ActionResponse<BannerResponse>(plainToInstance(BannerResponse, banar, ));
     }
 
     @Patch(":id")

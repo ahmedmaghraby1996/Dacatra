@@ -32,6 +32,7 @@ import { UpdatePharamcyRequest } from './dto/request/update-pharmact-request';
 import { PharmacyResponse } from './dto/respone/pharmacy.reposne';
 import { applyQueryIncludes } from 'src/core/helpers/service-related.helper';
 import { CreateDrugRequest } from './dto/request/create-drug-request';
+import { addSpecilizationRequest } from '../additional-info/dto/requests/add-specilization.request';
 
 @ApiHeader({
   name: 'Accept-Language',
@@ -120,6 +121,24 @@ export class PharmacyController {
   async getDrugCategories() {
     return new ActionResponse(
       this._i18nResponse.entity(await this.pharmacyService.getDrugCategories()),
+    );
+  }
+  @Post('/categories')
+  async CreateDrugCategory(@Body() request: addSpecilizationRequest) {
+    return new ActionResponse(
+      this._i18nResponse.entity(await this.pharmacyService.createCategories(request)),
+    );
+  }
+  @Put('/categories/:id')
+  async editDrugCategories(@Param('id') id: string,@Body() request: addSpecilizationRequest) {
+    return new ActionResponse(
+      this._i18nResponse.entity(await this.pharmacyService.editCategories(id,request)),
+    );
+  }
+  @Delete('/categories/:id')
+  async deleteDrugCategories(@Param('id') id: string) {
+    return new ActionResponse(
+      this._i18nResponse.entity(await this.pharmacyService.deleteCategories(id)),
     );
   }
   @UseGuards(JwtAuthGuard, RolesGuard)

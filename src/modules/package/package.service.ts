@@ -26,6 +26,10 @@ export class PackageService {
     const packages = await this.packageRepository.find();
     return packages;
   }
+  async getSinglSubscriptionPackages(id:string) {
+    const packages = await this.packageRepository.findOne({where:{id}});
+    return packages;
+  }
 
   async makePackage(request: CreatePackageRequest) {
     const get_package = plainToInstance(Package, request);

@@ -69,4 +69,13 @@ export class PackageController {
       await this.packageService.deletePackage(id),
     );
   }
+
+  @Get("/:id")
+  async getSingleSubscriptionPackages(@Param('id') id: string) {
+    return new ActionResponse(
+      this._i18nResponse.entity(
+        await this.packageService.getSinglSubscriptionPackages(id),
+      ),
+    );
+  }
 }

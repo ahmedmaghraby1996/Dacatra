@@ -38,6 +38,7 @@ import { UpdatePharamcyRequest } from './dto/request/update-pharmact-request';
 import { Subscription } from 'src/infrastructure/entities/subscription/subscription.entity';
 import { BaseUserService } from 'src/core/base/service/user-service.base';
 import { CreateDrugRequest } from './dto/request/create-drug-request';
+import { addSpecilizationRequest } from '../additional-info/dto/requests/add-specilization.request';
 
 @Injectable()
 export class PharmacyService extends BaseUserService<Pharmacy> {
@@ -605,7 +606,7 @@ export class PharmacyService extends BaseUserService<Pharmacy> {
     });
 
     if (subscription) {
-      console.log(1);
+    
       subscription_order =
         subscription.package.number_of_pharmacy_order <=
         subscription.number_of_used_orders
@@ -635,5 +636,17 @@ export class PharmacyService extends BaseUserService<Pharmacy> {
       await this.subscriptionRepository.save(subscription);
     }
     return true;
+  }
+
+
+  async createCategories(request: addSpecilizationRequest) {
+    return await this.drugCategoryRepository.save(plainToInstance(DrugCategory, request));
+  }
+
+  async editCategories(id,request: addSpecilizationRequest) {
+    return await this.drugCategoryRepository.update(id,plainToInstance(DrugCategory, request));
+  }
+  async deleteCategories(id) {
+    return await this.drugCategoryRepository.softDelete(id);
   }
 }

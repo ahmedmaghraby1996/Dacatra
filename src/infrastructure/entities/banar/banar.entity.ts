@@ -12,6 +12,10 @@ export class Banar extends AuditableEntity {
     @Column({nullable:true})
     ended_at: Date;
 
+    @Column({nullable:true})
+    description: string;
+    @Column({nullable:true})
+    doctor_id:string;
     @Column()
     is_active: boolean;
 }

@@ -6,5 +6,7 @@ export class BannerResponse{
     @Expose() @Transform(({ value }) => toUrl(value)) banar: string;
     @Expose() started_at: Date;
     @Expose() ended_at: Date;
+    @Expose() description: string;
+    @Expose() doctor_id: string;
     @Expose() is_active: boolean;
 }
