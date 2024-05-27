@@ -123,18 +123,28 @@ export class PharmacyController {
       this._i18nResponse.entity(await this.pharmacyService.getDrugCategories()),
     );
   }
+  
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Roles(Role.ADMIN)
   @Post('/categories')
   async CreateDrugCategory(@Body() request: addSpecilizationRequest) {
     return new ActionResponse(
       this._i18nResponse.entity(await this.pharmacyService.createCategories(request)),
     );
   }
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Roles(Role.ADMIN)
   @Put('/categories/:id')
   async editDrugCategories(@Param('id') id: string,@Body() request: addSpecilizationRequest) {
     return new ActionResponse(
       this._i18nResponse.entity(await this.pharmacyService.editCategories(id,request)),
     );
   }
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Roles(Role.ADMIN)
   @Delete('/categories/:id')
   async deleteDrugCategories(@Param('id') id: string) {
     return new ActionResponse(
