@@ -1,9 +1,10 @@
 import { BaseEntity } from 'src/infrastructure/base/base.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
 import { Drug } from './drug.entity';
+import { AuditableEntity } from 'src/infrastructure/base/auditable.entity';
 
 @Entity()
-export class DrugCategory extends BaseEntity {
+export class DrugCategory extends AuditableEntity {
   @Column()
   name_ar: string;
 
