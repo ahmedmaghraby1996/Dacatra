@@ -1,6 +1,6 @@
 import {
     Body,
-    Controller, Get, Param, Patch, UseGuards
+    Controller, Get, Inject, Param, Patch, UseGuards
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiHeader, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../authentication/guards/jwt-auth.guard';
@@ -16,9 +16,11 @@ import { ActionResponse } from 'src/core/base/responses/action.response';
 import { StaticPage } from 'src/infrastructure/entities/static-pages/static-pages.entity';
 import { plainToInstance } from 'class-transformer';
 import { StaticPageResponse } from './dto/response/static-page.response';
-
-
+import { REQUEST } from '@nestjs/core';
+import { Request } from 'express';
+@UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
+@Roles(Role.ADMIN, Role.PHARMACY, Role.CLIENT, Role.DOCTOR,Role.NURSE)
 @ApiHeader({
     name: 'Accept-Language',
     required: false,
@@ -30,6 +32,7 @@ export class StaticPageController {
     constructor(
         private readonly staticPageService: StaticPageService,
         private readonly _i18nResponse: I18nResponse,
+        @Inject(REQUEST) private readonly request: Request,
     ) { }
 
     @Patch()
@@ -43,7 +46,7 @@ export class StaticPageController {
     @Get("/:static_page_type")
     async getStaticPage(@Param() param: GetStaticPage): Promise<ActionResponse<StaticPageResponse>> {
         let staticPage = await this.staticPageService.getStaticPageByType(param.static_page_type);
-        staticPage = this._i18nResponse.entity(staticPage)
+        staticPage = this._i18nResponse.entity(staticPage, this.request.user.roles);
         
         const result = plainToInstance(StaticPageResponse, staticPage, {
             excludeExtraneousValues: true

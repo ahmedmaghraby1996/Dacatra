@@ -22,6 +22,7 @@ import { Wallet } from '../wallet/wallet.entity';
 import { Transaction } from '../wallet/transaction.entity';
 import { Subscription } from '../subscription/subscription.entity';
 import { PromoCode } from '../promo-code/promo-code.entity';
+import { SuggestionsComplaints } from '../suggestions-complaints/suggestions-complaints.entity';
 
 @Entity()
 export class User extends AuditableEntity {
@@ -29,6 +30,8 @@ export class User extends AuditableEntity {
   @OneToMany(()=>Reservation,reservation=>reservation.user)
   reservations:Reservation[]
 
+  @OneToMany(()=>SuggestionsComplaints,suggestionsComplaints=>suggestionsComplaints.user)
+  suggestionsComplaints:SuggestionsComplaints[]
   @OneToMany(()=>PromoCode,promoCode=>promoCode.user)
   promoCodes:PromoCode[]
   @OneToMany(()=>NurseOrder,nurserOrder=>nurserOrder.user)

@@ -2,6 +2,7 @@ import { Inject } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import { readEnv } from './env.helper';
+import { Role } from 'src/infrastructure/data/enums/role.enum';
 
 export function convertToI18nObject(obj: any, lang: string): any {
   if (obj) {
@@ -25,8 +26,12 @@ export function convertToI18nObject(obj: any, lang: string): any {
   }
 }
 
-export function i18nEntity(obj: any, lang: string): any {
+export function i18nEntity(obj: any, lang: string,roles?:string[]): any {
 
+
+  if(roles?.includes(Role.ADMIN)){
+    return obj;
+  }
   if (obj) {
     if (Array.isArray(obj)) {
       return obj.map((item) => i18nEntity(item, lang));
@@ -107,7 +112,7 @@ export class I18nResponse {
     this.lang = this.lang.slice(0, 2);
   }
 
-  public entity(obj: any): any {
-    return i18nEntity(obj, this.lang);
+  public entity(obj: any,roles?:string[]): any {
+    return i18nEntity(obj, this.lang,roles);
   }
 }

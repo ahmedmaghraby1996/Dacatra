@@ -1,6 +1,6 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import { FcmIntegrationService } from '../../../integration/notify/fcm-integration.service';
@@ -117,7 +117,12 @@ export class NotificationService extends BaseUserService<NotificationEntity> {
       sendToUsersNotificationRequest;
 
     const users = await this.userRepository.find({
-      where: { roles: sendToUsersNotificationRequest.role },
+      where: {
+        roles: sendToUsersNotificationRequest.role,
+        id: sendToUsersNotificationRequest?.users_id
+          ? 
+          In(sendToUsersNotificationRequest?.users_id):null,
+      },
     });
 
     users.map(async (user) => {

@@ -40,6 +40,8 @@ import { CancelReservationRequest } from './dto/requests/cancel-reservation-requ
 import { RateDoctorRequest } from './dto/requests/rate-doctor-request';
 
 @ApiTags('reservation')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@ApiBearerAuth()
 @ApiHeader({
   name: 'Accept-Language',
   required: false,

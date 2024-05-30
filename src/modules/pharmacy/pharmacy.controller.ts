@@ -34,12 +34,17 @@ import { applyQueryIncludes } from 'src/core/helpers/service-related.helper';
 import { CreateDrugRequest } from './dto/request/create-drug-request';
 import { addSpecilizationRequest } from '../additional-info/dto/requests/add-specilization.request';
 
+
 @ApiHeader({
   name: 'Accept-Language',
   required: false,
   description: 'Language header: en, ar',
 })
 @ApiTags('Pharmacy')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, RolesGuard)
+
+@Roles(Role.ADMIN, Role.PHARMACY, Role.CLIENT)
 @Controller('pharmacy')
 export class PharmacyController {
   constructor(
@@ -119,8 +124,9 @@ export class PharmacyController {
 
   @Get('/categories')
   async getDrugCategories() {
+
     return new ActionResponse(
-      this._i18nResponse.entity(await this.pharmacyService.getDrugCategories()),
+      this._i18nResponse.entity(await this.pharmacyService.getDrugCategories(),this.pharmacyService.currentUser.roles),
     );
   }
   
@@ -130,7 +136,7 @@ export class PharmacyController {
   @Post('/categories')
   async CreateDrugCategory(@Body() request: addSpecilizationRequest) {
     return new ActionResponse(
-      this._i18nResponse.entity(await this.pharmacyService.createCategories(request)),
+      this._i18nResponse.entity(await this.pharmacyService.createCategories(request),this.pharmacyService.currentUser.roles),
     );
   }
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -139,7 +145,7 @@ export class PharmacyController {
   @Put('/categories/:id')
   async editDrugCategories(@Param('id') id: string,@Body() request: addSpecilizationRequest) {
     return new ActionResponse(
-      this._i18nResponse.entity(await this.pharmacyService.editCategories(id,request)),
+      this._i18nResponse.entity(await this.pharmacyService.editCategories(id,request),this.pharmacyService.currentUser.roles),
     );
   }
   @UseGuards(JwtAuthGuard, RolesGuard)

@@ -1,22 +1,25 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SuggestionsComplaints } from 'src/infrastructure/entities/suggestions-complaints/suggestions-complaints.entity';
 import { Repository } from 'typeorm';
 import { SuggestionsComplaintsRequest } from './dto/suggestions-complaints.request';
+import { REQUEST } from '@nestjs/core';
+import { Request } from 'express';
 
 @Injectable()
 export class SuggestionsComplaintsService {
   constructor(
     @InjectRepository(SuggestionsComplaints)
     private _repo: Repository<SuggestionsComplaints>,
+    @Inject(REQUEST) private request: Request,
   ) {}
 
   async getSuggestionsComplaints(): Promise<SuggestionsComplaints[]> {
-    return await this._repo.find();
+    return await this._repo.find({relations:{user:true}});
   }
   async createSuggestionsComplaints(
     suggestionsComplaintsRequest: SuggestionsComplaintsRequest,
   ): Promise<SuggestionsComplaints> {
-    return await this._repo.save(suggestionsComplaintsRequest);
+    return await this._repo.save({...suggestionsComplaintsRequest,user_id:this.request.user.id});
   }
 }

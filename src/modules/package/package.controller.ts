@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Inject, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../authentication/guards/jwt-auth.guard';
 import { ApiTags, ApiHeader, ApiBearerAuth } from '@nestjs/swagger';
 import { RolesGuard } from '../authentication/guards/roles.guard';
@@ -7,6 +7,10 @@ import { I18nResponse } from 'src/core/helpers/i18n.helper';
 import { ActionResponse } from 'src/core/base/responses/action.response';
 import { CreatePackageRequest } from './dto/requests/create-package-request';
 import { UpdatePackageRequest } from './dto/requests/update-package-request';
+import { REQUEST } from '@nestjs/core';
+import { Request } from 'express';
+import { Role } from 'src/infrastructure/data/enums/role.enum';
+import { Roles } from '../authentication/guards/roles.decorator';
 @ApiTags('Package')
 @ApiHeader({
   name: 'Accept-Language',
@@ -15,18 +19,20 @@ import { UpdatePackageRequest } from './dto/requests/update-package-request';
 })
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(Role.ADMIN, Role.PHARMACY, Role.CLIENT)
 @Controller('package')
 export class PackageController {
   constructor(
     private packageService: PackageService,
     private readonly _i18nResponse: I18nResponse,
+    @Inject(REQUEST) private request: Request,
   ) {}
 
   @Get()
   async getSubscriptionPackages() {
     return new ActionResponse(
       this._i18nResponse.entity(
-        await this.packageService.getSubscriptionPackages(),
+        await this.packageService.getSubscriptionPackages(),this.request.user.roles
       ),
     );
   }
@@ -74,7 +80,7 @@ export class PackageController {
   async getSingleSubscriptionPackages(@Param('id') id: string) {
     return new ActionResponse(
       this._i18nResponse.entity(
-        await this.packageService.getSinglSubscriptionPackages(id),
+        await this.packageService.getSinglSubscriptionPackages(id),this.request.user.roles
       ),
     );
   }

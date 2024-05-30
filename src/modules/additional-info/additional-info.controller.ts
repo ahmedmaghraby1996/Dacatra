@@ -44,6 +44,8 @@ import { PharmacyResponse } from '../pharmacy/dto/respone/pharmacy.reposne';
 import { toUrl } from 'src/core/helpers/file.helper';
 import { addSpecilizationRequest } from './dto/requests/add-specilization.request';
 import { EditSpecilizationRequest } from './dto/requests/edit-specilization.request';
+import { REQUEST } from '@nestjs/core';
+import { Request } from 'express';
 
 @ApiTags('Additonal-info')
 @ApiHeader({
@@ -51,6 +53,9 @@ import { EditSpecilizationRequest } from './dto/requests/edit-specilization.requ
   required: false,
   description: 'Language header: en, ar',
 })
+@UseGuards(JwtAuthGuard, RolesGuard)
+@ApiBearerAuth()
+@Roles(Role.ADMIN, Role.PHARMACY, Role.CLIENT, Role.NURSE,Role.DOCTOR)
 @Controller('additional-info')
 export class AdditionalInfoController {
   constructor(
@@ -58,6 +63,7 @@ export class AdditionalInfoController {
     @Inject(I18nResponse) private readonly _i18nResponse: I18nResponse,
     private readonly nurseService: NurseOrderService,
     private readonly PharmacyService: PharmacyService,
+    @Inject(REQUEST) private readonly _request: Request,
   ) {}
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
@@ -70,7 +76,7 @@ export class AdditionalInfoController {
   async getSpecilizations() {
     const specializations =
       await this.additionalInfoService.getSpecilizations();
-    return new ActionResponse(this._i18nResponse.entity(specializations));
+    return new ActionResponse(this._i18nResponse.entity(specializations,this._request.user.roles));
   }
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
