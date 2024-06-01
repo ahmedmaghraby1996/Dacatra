@@ -77,7 +77,6 @@ export class ReservationController {
         `user_id=${this.reservationService.currentUser.id}`,
       );
     }
- 
 
     const reservations = this._i18nResponse.entity(
       await this.reservationService.findAll(query),
@@ -112,7 +111,21 @@ export class ReservationController {
     }
   }
 
- 
+  @Roles(Role.ADMIN)
+  @Get("/reviews")
+  async getReviews(@Query() query: PaginatedRequest) {
+    applyQueryFilters(query, `rate!-`);
+    applyQueryIncludes(query, 'user');
+
+    const reservations = await this.reservationService.findAll(query);
+    const total = await this.reservationService.count(query);
+    return new PaginatedResponse(
+      reservations.map((e) => {return {rating: e.rate,Comment: e.comment,order_number: e.number , user:{name: e.user.first_name + " " + e.user.last_name  ,id: e.user.id}}}), {
+        meta: { total: total, ...query },
+      }
+    )
+  }
+
   @Get('/:id')
   async findOne(@Param('id') id: string) {
     return new ActionResponse(

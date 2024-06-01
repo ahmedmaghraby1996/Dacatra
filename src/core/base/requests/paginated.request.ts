@@ -4,6 +4,7 @@ import { IsNumber, IsOptional } from 'class-validator';
 import { toRightNumber } from 'src/core/helpers/cast.helper';
 import {
   ILike,
+  IsNull,
   LessThan,
   LessThanOrEqual,
   Like,
@@ -115,6 +116,9 @@ export class PaginatedRequest {
           case '!=':
             whereFilter = { ...whereFilter, [key]: Not(value) };
             break;
+            case '!-':
+              whereFilter = { ...whereFilter, [key]: Not(IsNull()) };
+              break;
           default:
             whereFilter = { ...whereFilter, [key]: value };
             break;
@@ -191,6 +195,8 @@ export class PaginatedRequest {
           return { [key]: MoreThanOrEqual(value) };
         case '!=':
           return { [key]: Not(value) };
+          case '!-':
+            return { [key]: Not(IsNull()) };
         default:
           return { [key]: Like(`%${value}%`) };
       }
@@ -224,6 +230,7 @@ export class PaginatedRequest {
     if (statement.includes('>=')) return '>=';
     if (statement.includes('<')) return '<';
     if (statement.includes('>')) return '>';
+    if (statement.includes('!-')) return '!-';
     if (statement.includes('!=')) return '!=';
     return '=';
   }

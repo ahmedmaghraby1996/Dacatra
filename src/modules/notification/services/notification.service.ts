@@ -125,6 +125,15 @@ export class NotificationService extends BaseUserService<NotificationEntity> {
       },
     });
 
+    this.create(new NotificationEntity({
+      user_id: this.currentUser.id,
+      url: this.currentUser.id,
+      type: NotificationTypes.ADMIN,
+      title_ar: title_ar,
+      title_en: title_en,
+      text_ar: message_ar,
+      text_en: message_en,
+    }))
     users.map(async (user) => {
       return this.create(
         new NotificationEntity({

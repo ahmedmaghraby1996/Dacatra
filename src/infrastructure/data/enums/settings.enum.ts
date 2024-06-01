@@ -1,0 +1,4 @@
+export enum SettingsTypes {
+   PHARMACY_ORDER_NUMBER = 'PHARMACY_ORDER_NUMBER',
+   COMMESSION = 'COMMISSION',
+  }

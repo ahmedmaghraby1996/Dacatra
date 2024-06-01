@@ -19,6 +19,7 @@ import { PackageModule } from 'src/modules/package/package.module';
 import { PharmacyModule } from 'src/modules/pharmacy/pharmacy.module';
 import { PromoCodeModule } from 'src/modules/promo-code/promo-code.module';
 import { ReservationModule } from 'src/modules/reservation/reservation.module';
+import { SettingsModule } from 'src/modules/settings/settings.module';
 import { StaticPageModule } from 'src/modules/static-page/static-page.module';
 import { SuggestionsComplaintsModule } from 'src/modules/suggestions-complaints/suggestions-complaints.module';
 import { TransactionModule } from 'src/modules/transaction/transaction.module';
@@ -58,7 +59,8 @@ export default (app: INestApplication, config: ConfigService) => {
       TransactionModule,
       PackageModule,
       PromoCodeModule,
-      BanarModule
+      BanarModule,
+      SettingsModule
       
       
     ],

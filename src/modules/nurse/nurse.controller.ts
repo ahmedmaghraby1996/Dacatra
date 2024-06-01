@@ -20,6 +20,7 @@ import { ApiTags, ApiHeader, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../authentication/guards/jwt-auth.guard';
 import { RolesGuard } from '../authentication/guards/roles.guard';
 import {
+  applyQueryFilters,
   applyQueryIncludes,
   applyQuerySort,
 } from 'src/core/helpers/service-related.helper';
@@ -78,6 +79,24 @@ export class NurseController {
         is_verified: nurse.is_verified,
       });
     });
+
+    if (query.limit && query.page) {
+      const count = await this.nurseService.count(query);
+      return new PaginatedResponse(result, {
+        meta: { total: count, ...query },
+      });
+    } else return new ActionResponse(result);
+  }
+
+  @Roles(Role.ADMIN)
+  @Get("/reviews")
+  async getNurseReviews(@Query() query: PaginatedRequest) {
+    applyQueryIncludes(query, 'user');
+    applyQueryFilters(query, `rate!-`);
+
+    const nurses = await this.nurseOrderService.findAll(query);
+
+    const result = nurses.map((nurse) => {return{rate:nurse.rate,comment:nurse.comment,user:{name:nurse.user.first_name+" "+nurse.user.last_name,id:nurse.user.id}}});
 
     if (query.limit && query.page) {
       const count = await this.nurseService.count(query);

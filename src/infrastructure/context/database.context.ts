@@ -35,6 +35,8 @@ import { Subscription } from "../entities/subscription/subscription.entity";
 import { Package } from "../entities/subscription/package.entity";
 import { PromoCode } from "../entities/promo-code/promo-code.entity";
 import { Banar } from "../entities/banar/banar.entity";
+import { SettingsTypes } from "../data/enums/settings.enum";
+import { AppSettings } from "../entities/settings/setting.entity";
 
 export const DB_ENTITIES = [
   User,
@@ -72,7 +74,8 @@ export const DB_ENTITIES = [
   Subscription,
   Package,
   PromoCode,
-  Banar
+  Banar,
+ AppSettings
   
 ];
 

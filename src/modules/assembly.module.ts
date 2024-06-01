@@ -17,6 +17,7 @@ import { PackageModule } from './package/package.module';
 import { PromoCodeModule } from './promo-code/promo-code.module';
 import { Banar } from 'src/infrastructure/entities/banar/banar.entity';
 import { BanarModule } from './banar/banar.module';
+import { SettingsModule } from './settings/settings.module';
 
 @Module({
     imports: [
@@ -34,7 +35,9 @@ import { BanarModule } from './banar/banar.module';
         TransactionModule,
         PackageModule,
         PromoCodeModule,
-        BanarModule
+        BanarModule,
+  
+        SettingsModule
         
     ],
     exports: [
