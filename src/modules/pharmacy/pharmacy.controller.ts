@@ -213,7 +213,7 @@ export class PharmacyController {
   async getPharamcyByid(@Param('id') id: string) {
     const pharmacy = await this.pharmacyService.pharmacyRepository.findOne({
       where: { id },
-      relations: ['attachments'],
+      relations: ['attachments',"user"],
     });
     await Promise.all(
       (pharmacy.categories =
