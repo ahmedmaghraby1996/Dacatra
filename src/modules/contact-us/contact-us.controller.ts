@@ -16,7 +16,8 @@ import { PaginatedRequest } from 'src/core/base/requests/paginated.request';
 import { ContactUsService } from './contact-us.service';
 import { CreateContactDto } from './dtos/request/create-contact.dto';
 import { UpdateContactDto } from './dtos/request/update-contact.dto';
-
+import { REQUEST } from '@nestjs/core';
+import { Request } from 'express';
 @ApiTags('Contact-Us')
 @ApiHeader({
   name: 'Accept-Language',
@@ -28,6 +29,7 @@ export class ContactUsController {
   constructor(
     private contactUsService: ContactUsService,
     @Inject(I18nResponse) private readonly _i18nResponse: I18nResponse,
+    @Inject(REQUEST) private readonly request: Request,
   ) {}
 
   @Get()
@@ -35,7 +37,7 @@ export class ContactUsController {
     @Query() query?: PaginatedRequest,
   ): Promise<ContactUsResponse[]> {
     const contactUsData = await this.contactUsService.findAll(query);
-    const data: ContactUsResponse[] = this._i18nResponse.entity(contactUsData);
+    const data: ContactUsResponse[] = this._i18nResponse.entity(contactUsData,this.request.user.roles);
     const dataRes = data.map((contact_us) => {
       return new ContactUsResponse(contact_us);
     });

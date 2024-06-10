@@ -306,7 +306,7 @@ export class AdditionalInfoController {
     );
   }
 
-  @Roles(Role.DOCTOR)
+
   @Get('doctor/availability')
   async getDoctorAvailability(@Query() query: DoctorAvaliablityRequest) {
     return new ActionResponse(

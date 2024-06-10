@@ -48,7 +48,7 @@ export class NotificationController {
 
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.CLIENT,Role.DOCTOR,Role.NURSE,Role.PHARMACY)
+  @Roles(Role.CLIENT,Role.DOCTOR,Role.NURSE,Role.PHARMACY,Role.ADMIN)
   async findAll(@Query() query: PaginatedRequest) {
     let result = await this.notificationService.findAllOwned(query);
     result = this._i18nResponse.entity(result);

@@ -2,6 +2,7 @@ import { Expose, Transform, plainToInstance } from 'class-transformer';
 import { toUrl } from 'src/core/helpers/file.helper';
 import { PharmacyAttachmentType } from 'src/infrastructure/data/enums/pharmacy-attachment-typs';
 import { DrugCategory } from 'src/infrastructure/entities/pharmacy/drug-category.entity';
+import { User } from 'src/infrastructure/entities/user/user.entity';
 
 export class PharmacyResponse {
   @Expose()
@@ -15,6 +16,17 @@ export class PharmacyResponse {
   @Expose()
   expierence: number;
 
+  @Expose()
+  @Transform((value) => {
+    return {
+      name: value.obj.first_name + ' ' + value.obj.last_name,
+      id: value.obj.id,
+      avatar: toUrl(value.obj.avatar),
+      phone: value.obj.phone,
+      birthdate: value.obj.birthdate,
+    };
+  })
+  user: User;
   @Expose()
   address: string;
   @Expose()
