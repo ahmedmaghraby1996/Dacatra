@@ -5,6 +5,7 @@ import { Doctor } from 'src/infrastructure/entities/doctor/doctor.entity';
 import { Repository } from 'typeorm';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
+import { DoctorLicense } from 'src/infrastructure/entities/doctor/doctor-license.entity';
 @Injectable()
 export class DoctorService extends BaseUserService<Doctor> {
   constructor(
@@ -24,7 +25,7 @@ export class DoctorService extends BaseUserService<Doctor> {
 
     return await this.repository.findOne({
       where: { id },
-      relations: { user: true, specialization: true, clinic: true },
+      relations: { user: true, specialization: true, clinic: true  ,licenses:true,avaliablity:true, },
     });
   }
 }

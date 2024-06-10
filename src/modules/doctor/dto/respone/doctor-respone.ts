@@ -16,6 +16,7 @@ export class DoctorResopone {
   experience: number;
   clinic: any;
   user_id: string;
+  licenses: any;
   is_verified: boolean;
   constructor(data: Partial<Doctor>) {
     this.id = data.id;
@@ -32,5 +33,9 @@ export class DoctorResopone {
     this.home_consultation_price = data.home_consultation_price;
     this.clinic_consultation_price = data.clinic_consultation_price;
     this.clinic = data.clinic;
+    this.licenses = data.licenses.map((license) => {
+      license.image = toUrl(license.image);
+      return license;
+    });
   }
 }
