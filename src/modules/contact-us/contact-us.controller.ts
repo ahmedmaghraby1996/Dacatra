@@ -8,22 +8,31 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ContactUsResponse } from './dtos/response/contact-us.response';
 import { I18nResponse } from 'src/core/helpers/i18n.helper';
-import { ApiTags, ApiHeader } from '@nestjs/swagger';
+import { ApiTags, ApiHeader, ApiBearerAuth } from '@nestjs/swagger';
 import { PaginatedRequest } from 'src/core/base/requests/paginated.request';
 import { ContactUsService } from './contact-us.service';
 import { CreateContactDto } from './dtos/request/create-contact.dto';
 import { UpdateContactDto } from './dtos/request/update-contact.dto';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
+import { JwtAuthGuard } from '../authentication/guards/jwt-auth.guard';
+import { RolesGuard } from '../authentication/guards/roles.guard';
+import { Role } from 'src/infrastructure/data/enums/role.enum';
+import { Roles } from '../authentication/guards/roles.decorator';
 @ApiTags('Contact-Us')
 @ApiHeader({
   name: 'Accept-Language',
   required: false,
   description: 'Language header: en, ar',
 })
+@UseGuards(JwtAuthGuard, RolesGuard)
+@ApiBearerAuth()
+@Roles( Role.ADMIN, Role.PHARMACY, Role.CLIENT, Role.NURSE,Role.DOCTOR) 
+
 @Controller('contact-us')
 export class ContactUsController {
   constructor(
