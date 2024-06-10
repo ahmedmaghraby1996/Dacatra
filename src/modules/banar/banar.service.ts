@@ -32,6 +32,8 @@ export class BanarService extends BaseService<Banar> {
 
     let createdBanar = this.banarRepository.create({
       banar: tempImage,
+       description: banar.description,
+       doctor_id: banar.doctor_id,
       started_at: banar.started_at,
       ended_at: banar.ended_at,
       is_active: banar.is_active,
