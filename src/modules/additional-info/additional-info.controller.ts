@@ -46,6 +46,7 @@ import { addSpecilizationRequest } from './dto/requests/add-specilization.reques
 import { EditSpecilizationRequest } from './dto/requests/edit-specilization.request';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
+import { GetUserRequest } from './dto/requests/get-user.request';
 
 @ApiTags('Additonal-info')
 @ApiHeader({
@@ -207,7 +208,7 @@ export class AdditionalInfoController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @Get('profile')
-  async getProfile() {
+  async getProfile(@Query() request: GetUserRequest) {
     return new ActionResponse(
       plainToInstance(
         RegisterResponse,
