@@ -10,7 +10,7 @@ export class ContactUsResponse {
   constructor(data: Partial<ContactUsResponse>) {
     Object.assign(this, data);
     if (this.logo) {
-      this.logo = toUrl(this.logo, true);
+      this.logo = toUrl(this.logo);
       console.log(this.logo);
     }
   }
