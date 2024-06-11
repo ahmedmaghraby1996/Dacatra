@@ -45,7 +45,7 @@ import { toUrl } from 'src/core/helpers/file.helper';
 import { addSpecilizationRequest } from './dto/requests/add-specilization.request';
 import { EditSpecilizationRequest } from './dto/requests/edit-specilization.request';
 import { REQUEST } from '@nestjs/core';
-import { Request } from 'express';
+import { Request, query } from 'express';
 import { GetUserRequest } from './dto/requests/get-user.request';
 
 @ApiTags('Additonal-info')
@@ -107,9 +107,9 @@ export class AdditionalInfoController {
   @ApiBearerAuth()
   @Roles(Role.DOCTOR)
   @Put('doctor/info')
-  async addDoctorInfo(@Body() request: UpdateDoctorInfoRequest) {
+  async addDoctorInfo( @Query() query: GetUserRequest,@Body() request: UpdateDoctorInfoRequest) {
     return new ActionResponse(
-      await this.additionalInfoService.addDoctorInfo(request),
+      await this.additionalInfoService.addDoctorInfo(request,query.id),
     );
   }
 
@@ -127,10 +127,10 @@ export class AdditionalInfoController {
   @ApiBearerAuth()
   @Roles(Role.DOCTOR)
   @Get('doctor/info')
-  async getDoctorInfo() {
+  async getDoctorInfo( @Query() query: GetUserRequest) {
     return new ActionResponse(
       this._i18nResponse.entity(
-        await this.additionalInfoService.getFullDoctor(),
+        await this.additionalInfoService.getFullDoctor(query.id),
       ),
     );
   }
@@ -139,9 +139,9 @@ export class AdditionalInfoController {
   @ApiBearerAuth()
   @Roles(Role.CLIENT)
   @Put('client/info')
-  async addClientInfo(@Body() request: ClientInfoRequest) {
+  async addClientInfo( @Query() query: GetUserRequest,@Body() request: ClientInfoRequest) {
     return new ActionResponse(
-      await this.additionalInfoService.addClientInfo(request),
+      await this.additionalInfoService.addClientInfo(request,query.id),
     );
   }
 
@@ -152,6 +152,7 @@ export class AdditionalInfoController {
   @Roles(Role.CLIENT)
   @Post('client/family-members')
   async addFamilyMeber(
+    @Query() query: GetUserRequest,
     @Body() request: FamilyMemberRequest,
     @UploadedFile(new UploadValidator().build())
     avatarFile: Express.Multer.File,
@@ -160,7 +161,7 @@ export class AdditionalInfoController {
       request.avatarFile = avatarFile;
     }
     return new ActionResponse(
-      await this.additionalInfoService.addFamilyMembers(request),
+      await this.additionalInfoService.addFamilyMembers(  query.id,request),
     );
   }
 
@@ -168,9 +169,9 @@ export class AdditionalInfoController {
   @ApiBearerAuth()
   @Roles(Role.CLIENT)
   @Get('client/family-members')
-  async getFamilyMembers() {
+  async getFamilyMembers( @Query() query: GetUserRequest) {
     return new ActionResponse(
-      await this.additionalInfoService.getFamilyMembers(),
+      await this.additionalInfoService.getFamilyMembers(query.id),
     );
   }
 
@@ -178,8 +179,8 @@ export class AdditionalInfoController {
   @ApiBearerAuth()
   @Roles(Role.CLIENT)
   @Get('client/info')
-  async getClientInfo() {
-    return new ActionResponse(await this.additionalInfoService.getClientInfo());
+  async getClientInfo( @Query() query: GetUserRequest) {
+    return new ActionResponse(await this.additionalInfoService.getClientInfo(query.id));
   }
   @UseInterceptors(ClassSerializerInterceptor, FileInterceptor('avatarFile'))
   @ApiConsumes('multipart/form-data')
@@ -187,6 +188,7 @@ export class AdditionalInfoController {
   @ApiBearerAuth()
   @Put('update-profile')
   async updateProfile(
+    @Query() query: GetUserRequest,
     @Body() request: UpdateProfileRequest,
     @UploadedFile(new UploadValidator().build())
     avatarFile: Express.Multer.File,
@@ -197,7 +199,7 @@ export class AdditionalInfoController {
     return new ActionResponse(
       plainToInstance(
         RegisterResponse,
-        await this.additionalInfoService.updateProfile(request),
+        await this.additionalInfoService.updateProfile(query.id,request),
         {
           excludeExtraneousValues: true,
         },
@@ -208,11 +210,13 @@ export class AdditionalInfoController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @Get('profile')
-  async getProfile(@Query() request: GetUserRequest) {
+  async getProfile(@Query() query: GetUserRequest) {
+
+    
     return new ActionResponse(
       plainToInstance(
         RegisterResponse,
-        await this.additionalInfoService.getProfile(),
+        await this.additionalInfoService.getProfile(query.id),
         {
           excludeExtraneousValues: true,
         },
@@ -224,11 +228,11 @@ export class AdditionalInfoController {
   @Roles(Role.NURSE)
   @ApiBearerAuth()
   @Put('update-nurse-info')
-  async updateInfo(@Body() request: UpdateNurseRequest) {
+  async updateInfo( @Query() query: GetUserRequest,@Body() request: UpdateNurseRequest) {
     return new ActionResponse(
       await this.nurseService.addNurse(
         request,
-        this.nurseService.currentUser.id,
+        query.id  ?? this.nurseService.currentUser.id,
       ),
     );
   }
@@ -242,9 +246,9 @@ export class AdditionalInfoController {
   @ApiBearerAuth()
   @Roles(Role.NURSE)
   @Get('nurse-info')
-  async getNurseInfo() {
+  async getNurseInfo( @Query() query: GetUserRequest) {
     const nurse = await this.nurseService.getNurse(
-      this.nurseService.currentUser.id,
+      query.id ?? this.nurseService.currentUser.id,
     );
     nurse.license_images.map((img) => {
       img.image = toUrl(img.image);
@@ -259,11 +263,11 @@ export class AdditionalInfoController {
   @ApiBearerAuth()
   @Roles(Role.PHARMACY)
   @Put('update-pharmacy-info')
-  async updatePharmacy(@Body() request: UpdatePharamcyRequest) {
+  async updatePharmacy( @Query() query: GetUserRequest,@Body() request: UpdatePharamcyRequest) {
     return new ActionResponse(
       await this.PharmacyService.addPharmacyInfo(
         request,
-        this.PharmacyService.currentUser.id,
+       query.id  ??  this.PharmacyService.currentUser.id,
       ),
     );
   }
@@ -287,9 +291,9 @@ export class AdditionalInfoController {
   @ApiBearerAuth()
   @Roles(Role.PHARMACY)
   @Get('pharmacy-info')
-  async getPharmacyInfo() {
+  async getPharmacyInfo( @Query() query: GetUserRequest) {
     const pharamcy = await this.PharmacyService.getPharmacyInfo(
-      this.PharmacyService.currentUser.id,
+      query.id ?? this.PharmacyService.currentUser.id,
     );
 
     const categories = await this.PharmacyService.getCategories(

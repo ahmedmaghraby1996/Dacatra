@@ -76,10 +76,10 @@ export class AdditionalInfoService {
     return await this.specializationRepo.softDelete(id);
   }
 
-  async updateProfile(request: UpdateProfileRequest) {
+  async updateProfile(id,request: UpdateProfileRequest) {
     const user = plainToInstance(
       User,
-      { ...request, id: this.request.user.id },
+      { ...request, id: id?? this.request.user.id },
       {},
     );
 
@@ -246,21 +246,21 @@ export class AdditionalInfoService {
     return doctor;
   }
 
-  async addClientInfo(req: ClientInfoRequest) {
+  async addClientInfo(req: ClientInfoRequest, id?: string) {
     const clinet = await this.getClientInfo();
     await this.context.update(
       Client,
       clinet.id,
       plainToInstance(Client, {
-        user_id: this.request.user.id,
+        user_id: id?? this.request.user.id,
         ...req,
       }),
     );
     return await this.getClientInfo();
   }
 
-  async addFamilyMembers(req: FamilyMemberRequest) {
-    const client = await this.getClientInfo();
+  async addFamilyMembers(id:string,req: FamilyMemberRequest) {
+    const client = await this.getClientInfo(id);
 
     const familyMember = await this.context.save(
       plainToInstance(FamilyMember, {
@@ -295,14 +295,14 @@ export class AdditionalInfoService {
     });
   }
 
-  async getClientInfo() {
+  async getClientInfo(id?:string) {
     return await this.context.findOneBy(Client, {
-      user_id: this.request.user.id,
+      user_id: id?? this.request.user.id,
     });
   }
 
-  async getFamilyMembers() {
-    const client = await this.getClientInfo();
+  async getFamilyMembers(id?:string) {
+    const client = await this.getClientInfo(id);
     return (
       await this.context.find(FamilyMember, { where: { client_id: client.id } })
     ).map((member) => {
@@ -343,9 +343,10 @@ export class AdditionalInfoService {
     return result;
   }
 
-  async getProfile() {
+  async getProfile(id:string) {
+   
     return await this.context.findOneBy(User, {
-      id: this.request.user.id,
+      id: id??this.request.user.id,
     });
   }
 }
