@@ -33,7 +33,7 @@ export class DoctorResopone {
     this.home_consultation_price = data.home_consultation_price;
     this.clinic_consultation_price = data.clinic_consultation_price;
     this.clinic = data.clinic;
-    this.licenses = data.licenses.map((license) => {
+    this.licenses = data.licenses?.map((license) => {
       license.image = toUrl(license.image);
       return license;
     });
