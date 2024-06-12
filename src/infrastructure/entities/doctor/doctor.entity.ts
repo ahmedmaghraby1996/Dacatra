@@ -56,6 +56,9 @@ export class Doctor extends OwnedEntity {
   @Column({ nullable: true })
   summery: string;
 
+  @Column({nullable:true})
+  cover_image:string
+
   @Column({ type: 'float', precision: 10, scale: 6, nullable: true })
   latitude: number;
 
