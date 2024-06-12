@@ -44,6 +44,10 @@ export class DoctorInfoRequest extends RegisterRequest {
   @IsString()
   @IsNotEmpty()
   summery: string;
+  @ApiProperty({required:false})
+  @IsString()
+  @IsOptional()
+  cover_image:string
 
   @ApiProperty()
   @Transform(({ value }) => Number(value))
