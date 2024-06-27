@@ -125,7 +125,7 @@ export class AdditionalInfoController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
-  @Roles(Role.DOCTOR)
+  @Roles(Role.DOCTOR,Role.ADMIN)
   @Get('doctor/info')
   async getDoctorInfo( @Query() query: GetUserRequest) {
     return new ActionResponse(

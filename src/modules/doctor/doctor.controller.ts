@@ -35,6 +35,7 @@ export class DoctorController {
         new DoctorResopone({
           id: doctor.id,
           user: doctor.user,
+          user_id: doctor.user_id,
           specialization: doctor.specialization,
           rating: doctor.number_of_reviews == 0 ? 0 : Number( doctor.rating/doctor.number_of_reviews)
         }),
