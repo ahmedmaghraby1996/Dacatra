@@ -18,6 +18,8 @@ export class DoctorResopone {
   user_id: string;
   cover_image: string;
   licenses: any;
+  first_name: string;
+  last_name: string;
   is_verified: boolean;
   constructor(data: Partial<Doctor>) {
     this.id = data.id;
@@ -25,6 +27,8 @@ export class DoctorResopone {
     this.is_verified = data.is_verified;
     this.avatar = data.user.avatar ? toUrl(data.user.avatar) : null;
     this.cover_image = data.cover_image ;
+    this.first_name = data.user.first_name;
+    this.last_name = data.user.last_name;
     this.name = data.user.first_name + ' ' + data.user.last_name;
     this.experience = data.year_of_experience;
     this.summery = data.summery;
