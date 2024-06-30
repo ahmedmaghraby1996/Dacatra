@@ -115,7 +115,7 @@ export class AdditionalInfoController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
-  @Roles(Role.DOCTOR)
+  @Roles(Role.DOCTOR,Role.ADMIN)
   @Delete('doctor-license/:id')
   async deleteDoctorLicense(@Param('id') id: string) {
     return new ActionResponse(
