@@ -27,7 +27,7 @@ export function convertToI18nObject(obj: any, lang: string): any {
   }
 }
 
-export function i18nEntity(obj: any, lang: string,roles?:string[],full_data?:boolean): any {
+export function i18nEntity(obj: any, lang: string,roles?:string[]): any {
 
 
   if(roles?.includes(Role.ADMIN)){
@@ -52,11 +52,11 @@ export function i18nEntity(obj: any, lang: string,roles?:string[],full_data?:boo
             const newKey = key.replace(`_${lang}`, '');
             newObj[newKey] = obj[key];
 
-            if(full_data==false){
+          
             delete obj[`${newKey}_ar`];
             delete obj[`${newKey}_en`];
             delete newObj[`${newKey}_ar`];
-            delete newObj[`${newKey}_en`];}
+            delete newObj[`${newKey}_en`];
           } else {
             newObj[key] = i18nEntity(obj[key], lang);
           }
@@ -114,7 +114,7 @@ export class I18nResponse {
     this.lang = this.lang.slice(0, 2);
   }
 
-  public entity(obj: any,roles?:string[],full_data?:boolean): any {
-    return i18nEntity(obj, this.lang,roles,full_data??false);
+  public entity(obj: any,roles?:string[]): any {
+    return i18nEntity(obj, this.lang,roles);
   }
 }
