@@ -78,46 +78,60 @@ export class AdditionalInfoController {
   async getSpecilizations() {
     const specializations =
       await this.additionalInfoService.getSpecilizations();
-      
-    return new ActionResponse(this._i18nResponse.entity(specializations,this._request?.user?.roles,true));
+    const data = this._i18nResponse.entity(specializations);
+    return new ActionResponse(
+      data.map((e, index) => {
+        return {
+          ...e,
+          name_ar: specializations[index].name_ar,
+          name_en: specializations[index].name_en,
+        };
+      }),
+    );
   }
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @Roles(Role.ADMIN)
   @Post('specializations')
   async addSpecilizations(@Body() request: addSpecilizationRequest) {
-   
-    return new ActionResponse(await this.additionalInfoService.addSpecilizations(request));
+    return new ActionResponse(
+      await this.additionalInfoService.addSpecilizations(request),
+    );
   }
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @Roles(Role.ADMIN)
   @Put('specializations')
   async editSpecilizations(@Body() request: EditSpecilizationRequest) {
-   
-    return new ActionResponse(await this.additionalInfoService.editSpecilizations(request));
+    return new ActionResponse(
+      await this.additionalInfoService.editSpecilizations(request),
+    );
   }
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @Roles(Role.ADMIN)
   @Delete('specializations/:id')
   async deleteSpecilizations(@Param('id') id: string) {
-   
-    return new ActionResponse(await this.additionalInfoService.deleteSpecilizations(id));
+    return new ActionResponse(
+      await this.additionalInfoService.deleteSpecilizations(id),
+    );
   }
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
-  @Roles(Role.DOCTOR,Role.ADMIN)
+  @Roles(Role.DOCTOR, Role.ADMIN)
   @Put('doctor/info')
-  async addDoctorInfo( @Query() query: GetUserRequest,@Body() request: UpdateDoctorInfoRequest) {
+  async addDoctorInfo(
+    @Query() query: GetUserRequest,
+    @Body() request: UpdateDoctorInfoRequest,
+  ) {
     return new ActionResponse(
-      await this.additionalInfoService.addDoctorInfo(request,query.id),
+      await this.additionalInfoService.addDoctorInfo(request, query.id),
     );
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
-  @Roles(Role.DOCTOR,Role.ADMIN)
+  @Roles(Role.DOCTOR, Role.ADMIN)
   @Delete('doctor-license/:id')
   async deleteDoctorLicense(@Param('id') id: string) {
     return new ActionResponse(
@@ -127,9 +141,9 @@ export class AdditionalInfoController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
-  @Roles(Role.DOCTOR,Role.ADMIN)
+  @Roles(Role.DOCTOR, Role.ADMIN)
   @Get('doctor/info')
-  async getDoctorInfo( @Query() query: GetUserRequest) {
+  async getDoctorInfo(@Query() query: GetUserRequest) {
     return new ActionResponse(
       this._i18nResponse.entity(
         await this.additionalInfoService.getFullDoctor(query.id),
@@ -139,11 +153,14 @@ export class AdditionalInfoController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
-  @Roles(Role.CLIENT,Role.ADMIN)
+  @Roles(Role.CLIENT, Role.ADMIN)
   @Put('client/info')
-  async addClientInfo( @Query() query: GetUserRequest,@Body() request: ClientInfoRequest) {
+  async addClientInfo(
+    @Query() query: GetUserRequest,
+    @Body() request: ClientInfoRequest,
+  ) {
     return new ActionResponse(
-      await this.additionalInfoService.addClientInfo(request,query.id),
+      await this.additionalInfoService.addClientInfo(request, query.id),
     );
   }
 
@@ -163,7 +180,7 @@ export class AdditionalInfoController {
       request.avatarFile = avatarFile;
     }
     return new ActionResponse(
-      await this.additionalInfoService.addFamilyMembers(  query.id,request),
+      await this.additionalInfoService.addFamilyMembers(query.id, request),
     );
   }
 
@@ -171,7 +188,7 @@ export class AdditionalInfoController {
   @ApiBearerAuth()
   @Roles(Role.CLIENT)
   @Get('client/family-members')
-  async getFamilyMembers( @Query() query: GetUserRequest) {
+  async getFamilyMembers(@Query() query: GetUserRequest) {
     return new ActionResponse(
       await this.additionalInfoService.getFamilyMembers(query.id),
     );
@@ -181,8 +198,10 @@ export class AdditionalInfoController {
   @ApiBearerAuth()
   @Roles(Role.CLIENT)
   @Get('client/info')
-  async getClientInfo( @Query() query: GetUserRequest) {
-    return new ActionResponse(await this.additionalInfoService.getClientInfo(query.id));
+  async getClientInfo(@Query() query: GetUserRequest) {
+    return new ActionResponse(
+      await this.additionalInfoService.getClientInfo(query.id),
+    );
   }
   @UseInterceptors(ClassSerializerInterceptor, FileInterceptor('avatarFile'))
   @ApiConsumes('multipart/form-data')
@@ -201,7 +220,7 @@ export class AdditionalInfoController {
     return new ActionResponse(
       plainToInstance(
         RegisterResponse,
-        await this.additionalInfoService.updateProfile(query.id,request),
+        await this.additionalInfoService.updateProfile(query.id, request),
         {
           excludeExtraneousValues: true,
         },
@@ -213,8 +232,6 @@ export class AdditionalInfoController {
   @ApiBearerAuth()
   @Get('profile')
   async getProfile(@Query() query: GetUserRequest) {
-
-    
     return new ActionResponse(
       plainToInstance(
         RegisterResponse,
@@ -230,11 +247,14 @@ export class AdditionalInfoController {
   @Roles(Role.NURSE)
   @ApiBearerAuth()
   @Put('update-nurse-info')
-  async updateInfo( @Query() query: GetUserRequest,@Body() request: UpdateNurseRequest) {
+  async updateInfo(
+    @Query() query: GetUserRequest,
+    @Body() request: UpdateNurseRequest,
+  ) {
     return new ActionResponse(
       await this.nurseService.addNurse(
         request,
-        query.id  ?? this.nurseService.currentUser.id,
+        query.id ?? this.nurseService.currentUser.id,
       ),
     );
   }
@@ -248,7 +268,7 @@ export class AdditionalInfoController {
   @ApiBearerAuth()
   @Roles(Role.NURSE)
   @Get('nurse-info')
-  async getNurseInfo( @Query() query: GetUserRequest) {
+  async getNurseInfo(@Query() query: GetUserRequest) {
     const nurse = await this.nurseService.getNurse(
       query.id ?? this.nurseService.currentUser.id,
     );
@@ -265,11 +285,14 @@ export class AdditionalInfoController {
   @ApiBearerAuth()
   @Roles(Role.PHARMACY)
   @Put('update-pharmacy-info')
-  async updatePharmacy( @Query() query: GetUserRequest,@Body() request: UpdatePharamcyRequest) {
+  async updatePharmacy(
+    @Query() query: GetUserRequest,
+    @Body() request: UpdatePharamcyRequest,
+  ) {
     return new ActionResponse(
       await this.PharmacyService.addPharmacyInfo(
         request,
-       query.id  ??  this.PharmacyService.currentUser.id,
+        query.id ?? this.PharmacyService.currentUser.id,
       ),
     );
   }
@@ -293,7 +316,7 @@ export class AdditionalInfoController {
   @ApiBearerAuth()
   @Roles(Role.PHARMACY)
   @Get('pharmacy-info')
-  async getPharmacyInfo( @Query() query: GetUserRequest) {
+  async getPharmacyInfo(@Query() query: GetUserRequest) {
     const pharamcy = await this.PharmacyService.getPharmacyInfo(
       query.id ?? this.PharmacyService.currentUser.id,
     );
@@ -312,7 +335,6 @@ export class AdditionalInfoController {
       ),
     );
   }
-
 
   @Get('doctor/availability')
   async getDoctorAvailability(@Query() query: DoctorAvaliablityRequest) {
