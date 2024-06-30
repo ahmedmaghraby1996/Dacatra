@@ -28,7 +28,7 @@ export function convertToI18nObject(obj: any, lang: string): any {
 }
 
 export function i18nEntity(obj: any, lang: string,roles?:string[],full_data?:boolean): any {
-console.log(full_data)
+
 
   if(roles?.includes(Role.ADMIN)){
     return obj;
@@ -52,7 +52,7 @@ console.log(full_data)
             const newKey = key.replace(`_${lang}`, '');
             newObj[newKey] = obj[key];
 
-            if(full_data==true){
+            if(full_data==false){
             delete obj[`${newKey}_ar`];
             delete obj[`${newKey}_en`];
             delete newObj[`${newKey}_ar`];
