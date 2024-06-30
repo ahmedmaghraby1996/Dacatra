@@ -28,7 +28,7 @@ export function convertToI18nObject(obj: any, lang: string): any {
 }
 
 export function i18nEntity(obj: any, lang: string,roles?:string[],full_data?:boolean): any {
-if(!full_data)full_data=false;
+console.log(full_data)
 
   if(roles?.includes(Role.ADMIN)){
     return obj;
