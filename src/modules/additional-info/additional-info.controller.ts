@@ -77,7 +77,8 @@ export class AdditionalInfoController {
   async getSpecilizations() {
     const specializations =
       await this.additionalInfoService.getSpecilizations();
-    return new ActionResponse(this._i18nResponse.entity(specializations,this._request?.user?.roles));
+      const data= this._i18nResponse.entity(specializations,);
+    return new ActionResponse({...specializations,name_ar:data.name_ar,name_en:data.name_en});
   }
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
