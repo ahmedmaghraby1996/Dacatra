@@ -78,7 +78,7 @@ export class AdditionalInfoController {
   async getSpecilizations() {
     const specializations =
       await this.additionalInfoService.getSpecilizations();
-    const data = this._i18nResponse.entity(specializations).map((e) => {
+    const data = this._i18nResponse.entity(await this.additionalInfoService.getSpecilizations()).map((e) => {
       return {
         ...e,
         name_ar: specializations.find((s) => s.id == e.id).name_ar,
