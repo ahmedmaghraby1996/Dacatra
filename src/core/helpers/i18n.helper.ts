@@ -3,6 +3,7 @@ import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import { readEnv } from './env.helper';
 import { Role } from 'src/infrastructure/data/enums/role.enum';
+import { boolean } from 'joi';
 
 export function convertToI18nObject(obj: any, lang: string): any {
   if (obj) {
@@ -26,8 +27,8 @@ export function convertToI18nObject(obj: any, lang: string): any {
   }
 }
 
-export function i18nEntity(obj: any, lang: string,roles?:string[]): any {
-
+export function i18nEntity(obj: any, lang: string,roles?:string[],full_data?:boolean): any {
+if(!full_data)full_data=false;
 
   if(roles?.includes(Role.ADMIN)){
     return obj;
@@ -51,10 +52,11 @@ export function i18nEntity(obj: any, lang: string,roles?:string[]): any {
             const newKey = key.replace(`_${lang}`, '');
             newObj[newKey] = obj[key];
 
+            if(full_data==true){
             delete obj[`${newKey}_ar`];
             delete obj[`${newKey}_en`];
             delete newObj[`${newKey}_ar`];
-            delete newObj[`${newKey}_en`];
+            delete newObj[`${newKey}_en`];}
           } else {
             newObj[key] = i18nEntity(obj[key], lang);
           }
@@ -112,7 +114,7 @@ export class I18nResponse {
     this.lang = this.lang.slice(0, 2);
   }
 
-  public entity(obj: any,roles?:string[]): any {
-    return i18nEntity(obj, this.lang,roles);
+  public entity(obj: any,roles?:string[],full_data?:boolean): any {
+    return i18nEntity(obj, this.lang,roles,full_data);
   }
 }

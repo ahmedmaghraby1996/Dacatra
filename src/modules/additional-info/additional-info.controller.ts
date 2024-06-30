@@ -47,6 +47,7 @@ import { EditSpecilizationRequest } from './dto/requests/edit-specilization.requ
 import { REQUEST } from '@nestjs/core';
 import { Request, query } from 'express';
 import { GetUserRequest } from './dto/requests/get-user.request';
+import { Index } from 'typeorm';
 
 @ApiTags('Additonal-info')
 @ApiHeader({
@@ -77,8 +78,8 @@ export class AdditionalInfoController {
   async getSpecilizations() {
     const specializations =
       await this.additionalInfoService.getSpecilizations();
-      const data= this._i18nResponse.entity(specializations,);
-    return new ActionResponse({...specializations,name_ar:data.name_ar,name_en:data.name_en});
+      
+    return new ActionResponse(this._i18nResponse.entity(specializations,this._request?.user?.roles,true));
   }
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
