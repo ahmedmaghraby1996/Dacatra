@@ -544,7 +544,9 @@ export class PharmacyService extends BaseUserService<Pharmacy> {
         },
       },
     });
-
+    const pharamcy = await this.pharmacyRepository.findOne({
+      where: { user_id: this.currentUser.id },
+    });
     const categories =
       order.categories == null
         ? []
@@ -568,6 +570,9 @@ export class PharmacyService extends BaseUserService<Pharmacy> {
       PhOrderResponse,
       {
         ...order,
+        has_replied: pharamcy
+        ? await this.hasReplied(order.id, pharamcy.id)
+        : false,
         categories: categories,
         drugs: drugs,
       },
