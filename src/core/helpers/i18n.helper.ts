@@ -115,6 +115,6 @@ export class I18nResponse {
   }
 
   public entity(obj: any,roles?:string[],full_data?:boolean): any {
-    return i18nEntity(obj, this.lang,roles,full_data);
+    return i18nEntity(obj, this.lang,roles,full_data??false);
   }
 }
