@@ -78,16 +78,16 @@ export class AdditionalInfoController {
   async getSpecilizations() {
     const specializations =
       await this.additionalInfoService.getSpecilizations();
-    const data = this._i18nResponse.entity(specializations);
-    return new ActionResponse(
-      data.map((e, index) => {
-        return {
-          ...e,
-          name_ar: specializations[index].name_ar,
-          name_en: specializations[index].name_en,
-        };
-      }),
-    );
+    const data = this._i18nResponse.entity(specializations).map((e) => {
+      return {
+        ...e,
+        name_ar: specializations.find((s) => s.id == e.id).name_ar,
+        name_en: specializations.find((s) => s.id == e.id).name_en,
+      };
+    });
+    return new ActionResponse(data);
+    
+    
   }
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
