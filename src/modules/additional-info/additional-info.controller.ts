@@ -105,7 +105,7 @@ export class AdditionalInfoController {
   }
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
-  @Roles(Role.DOCTOR)
+  @Roles(Role.DOCTOR,Role.ADMIN)
   @Put('doctor/info')
   async addDoctorInfo( @Query() query: GetUserRequest,@Body() request: UpdateDoctorInfoRequest) {
     return new ActionResponse(
@@ -137,7 +137,7 @@ export class AdditionalInfoController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
-  @Roles(Role.CLIENT)
+  @Roles(Role.CLIENT,Role.ADMIN)
   @Put('client/info')
   async addClientInfo( @Query() query: GetUserRequest,@Body() request: ClientInfoRequest) {
     return new ActionResponse(
