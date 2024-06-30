@@ -26,7 +26,7 @@ export class DoctorResopone {
     this.user_id=data.user_id;
     this.is_verified = data.is_verified;
     this.avatar = data.user.avatar ? toUrl(data.user.avatar) : null;
-    this.cover_image = data.cover_image ;
+    this.cover_image = toUrl( data.cover_image) ;
     this.first_name = data.user.first_name;
     this.last_name = data.user.last_name;
     this.name = data.user.first_name + ' ' + data.user.last_name;

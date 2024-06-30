@@ -243,6 +243,7 @@ export class AdditionalInfoService {
     });
 
     if (doctor.licenses) doctor.licenses= doctor.licenses.map((e) => {e.image = toUrl(e.image) ;return e;});
+    if(doctor.cover_image)doctor.cover_image = toUrl(doctor.cover_image)
     return doctor;
   }
 
