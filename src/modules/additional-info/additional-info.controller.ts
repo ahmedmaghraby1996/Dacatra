@@ -54,9 +54,9 @@ import { GetUserRequest } from './dto/requests/get-user.request';
   required: false,
   description: 'Language header: en, ar',
 })
-@UseGuards(JwtAuthGuard, RolesGuard)
-@ApiBearerAuth()
-@Roles(Role.ADMIN, Role.PHARMACY, Role.CLIENT, Role.NURSE,Role.DOCTOR)
+// @UseGuards(JwtAuthGuard, RolesGuard)
+// @ApiBearerAuth()
+// @Roles(Role.ADMIN, Role.PHARMACY, Role.CLIENT, Role.NURSE,Role.DOCTOR)
 @Controller('additional-info')
 export class AdditionalInfoController {
   constructor(
@@ -77,7 +77,7 @@ export class AdditionalInfoController {
   async getSpecilizations() {
     const specializations =
       await this.additionalInfoService.getSpecilizations();
-    return new ActionResponse(this._i18nResponse.entity(specializations,this._request.user.roles));
+    return new ActionResponse(this._i18nResponse.entity(specializations,this._request?.user?.roles));
   }
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
