@@ -297,6 +297,7 @@ export class ReservationService extends BaseUserService<Reservation> {
     return await this._repo.findOne({
       where: { id },
       relations: {
+attachments: true,
         doctor: { user: true, clinic: true },
         user: { client_info: true },
         specialization: true,

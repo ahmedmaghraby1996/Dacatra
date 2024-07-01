@@ -89,14 +89,23 @@ export class NurseController {
   }
 
   @Roles(Role.ADMIN)
-  @Get("/reviews")
+  @Get('/reviews')
   async getNurseReviews(@Query() query: PaginatedRequest) {
     applyQueryIncludes(query, 'user');
     applyQueryFilters(query, `rate!-`);
 
     const nurses = await this.nurseOrderService.findAll(query);
 
-    const result = nurses.map((nurse) => {return{rate:nurse.rate,comment:nurse.comment,user:{name:nurse.user.first_name+" "+nurse.user.last_name,id:nurse.user.id}}});
+    const result = nurses.map((nurse) => {
+      return {
+        rate: nurse.rate,
+        comment: nurse.comment,
+        user: {
+          name: nurse.user.first_name + ' ' + nurse.user.last_name,
+          id: nurse.user.id,
+        },
+      };
+    });
 
     if (query.limit && query.page) {
       const count = await this.nurseService.count(query);
@@ -170,8 +179,20 @@ export class NurseController {
   }
   @Get('order/:id')
   async getSingle(@Param('id') id: string) {
+    const nurse = await this.nurseOrderService.getNurse(
+      this.nurseOrderService.currentUser.id,
+    );
     const order = await this.nurseOrderService.getSingleOrder(id);
-    return new ActionResponse(plainToInstance(NurseOrderResponse, order));
+    return new ActionResponse(
+      plainToInstance(NurseOrderResponse, {
+        ...order,
+        sent_offer: await this.nurseOrderService.sentOffer(
+          order.id,
+
+          nurse === null ? null : nurse.id,
+        ),
+      }),
+    );
   }
 
   @Post('accept/offer/:id')
