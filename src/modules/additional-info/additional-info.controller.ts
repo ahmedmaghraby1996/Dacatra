@@ -168,7 +168,7 @@ export class AdditionalInfoController {
   @ApiConsumes('multipart/form-data')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
-  @Roles(Role.CLIENT)
+  @Roles(Role.CLIENT,Role.ADMIN)
   @Post('client/family-members')
   async addFamilyMeber(
     @Query() query: GetUserRequest,
@@ -186,7 +186,7 @@ export class AdditionalInfoController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
-  @Roles(Role.CLIENT)
+  @Roles(Role.CLIENT,Role.ADMIN)
   @Get('client/family-members')
   async getFamilyMembers(@Query() query: GetUserRequest) {
     return new ActionResponse(
@@ -244,7 +244,7 @@ export class AdditionalInfoController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.NURSE)
+  @Roles(Role.NURSE,Role.ADMIN)
   @ApiBearerAuth()
   @Put('update-nurse-info')
   async updateInfo(
@@ -266,7 +266,7 @@ export class AdditionalInfoController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
-  @Roles(Role.NURSE)
+  @Roles(Role.NURSE,Role.ADMIN)
   @Get('nurse-info')
   async getNurseInfo(@Query() query: GetUserRequest) {
     const nurse = await this.nurseService.getNurse(
@@ -283,7 +283,7 @@ export class AdditionalInfoController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
-  @Roles(Role.PHARMACY)
+  @Roles(Role.PHARMACY,Role.ADMIN)
   @Put('update-pharmacy-info')
   async updatePharmacy(
     @Query() query: GetUserRequest,
@@ -299,7 +299,7 @@ export class AdditionalInfoController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
-  @Roles(Role.PHARMACY)
+  @Roles(Role.PHARMACY,Role.ADMIN)
   @Delete('delete-pharmacy-license/:id')
   async deletePharmacyLicense(@Param('id') id: string) {
     return new ActionResponse(await this.PharmacyService.deleteLicense(id));
@@ -314,7 +314,7 @@ export class AdditionalInfoController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
-  @Roles(Role.PHARMACY)
+  @Roles(Role.PHARMACY,Role.ADMIN)
   @Get('pharmacy-info')
   async getPharmacyInfo(@Query() query: GetUserRequest) {
     const pharamcy = await this.PharmacyService.getPharmacyInfo(
