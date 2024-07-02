@@ -196,7 +196,7 @@ export class AdditionalInfoController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
-  @Roles(Role.CLIENT)
+  @Roles(Role.CLIENT,Role.ADMIN)
   @Get('client/info')
   async getClientInfo(@Query() query: GetUserRequest) {
     return new ActionResponse(
